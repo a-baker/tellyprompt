@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1462213134135,
+        "author": "Aaron",
+        "text": "Hello World!",
+        "dateTime": "02/05/2016 @ 18:18"
+    },
+    {
+        "id": 1462214023729,
+        "author": "Other User",
+        "text": "Hey",
+        "dateTime": "02/05/2016 @ 18:33"
+    },
+    {
+        "id": 1462214322328,
+        "author": "Aaron",
+        "text": "Hi",
+        "dateTime": "02/05/2016 @ 18:38"
+    },
+    {
+        "id": 1462214349594,
+        "author": "Bob",
+        "text": "Hello",
+        "dateTime": "02/05/2016 @ 18:39"
+    }
+]

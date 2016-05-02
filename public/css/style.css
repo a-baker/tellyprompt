@@ -1,0 +1,32 @@
+h1, h2.commentAuthor {
+    color: #22264b;
+}
+
+span.postTime {
+    color: #8b8b8b;
+    font-weight: 300;
+    font-size: 50%;
+    margin-left: 10px;
+}
+
+.commentForm input {
+    outline: none;
+}
+
+.commentForm input[type="text"] {
+    height: 30px;
+    padding: 5px;
+    font-size: 20px;
+}
+
+.commentForm input[type="submit"] {
+    padding: 5px 15px;
+    background: #ccc;
+    border: 0 none;
+    cursor: pointer;
+    height: 44px;
+    vertical-align: top;
+    color: white;
+    font-size: 15px;
+    text-transform: uppercase;
+}
