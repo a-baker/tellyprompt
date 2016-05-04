@@ -1,5 +1,15 @@
 var socket = io();
 
+var username = "";
+
+$.getJSON("/api/user_data", function(data) {
+    // Make sure the data contains the username as expected before using it
+    if (data.hasOwnProperty('username')) {
+        console.log('Username: ' + data.username);
+        username = data.username;
+    }
+});
+
 var Message = React.createClass({
   rawMarkup: function() {
     var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
@@ -146,21 +156,15 @@ var MessageForm = React.createClass({
       var dateTime = today;
 
 
-    if (!text || !author) {
+    if (!text) {
       return;
     }
-    this.props.onMessageSubmit({author: author, text: text, dateTime: dateTime});
+    this.props.onMessageSubmit({author: username, text: text, dateTime: dateTime});
     this.setState({author: '', text: ''});
   },
   render: function() {
     return (
       <form className="messageForm" onSubmit={this.handleSubmit}>
-        <input
-          type="text"
-          placeholder="Your name"
-          value={this.state.author}
-          onChange={this.handleAuthorChange}
-        />
         <input
           type="text"
           placeholder="Say something..."

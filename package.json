@@ -4,7 +4,9 @@
   "description": "A live chat service for discussing TV shows.",
   "main": "server.js",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.4.3",
+    "connect-flash": "^0.1.1",
     "express": "^4.4.5",
     "express-session": "^1.13.0",
     "jade": "^1.11.0",

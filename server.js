@@ -16,7 +16,6 @@ var mongoose = require('mongoose');
 mongoose.connect(dbConfig.url);
 
 
-
 // Configuring Passport
 var passport = require('passport');
 var expressSession = require('express-session');
@@ -24,11 +23,21 @@ app.use(expressSession({secret: 'secret'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Using the flash middleware provided by connect-flash to store messages in session
+ // and displaying in templates
+var flash = require('connect-flash');
+app.use(flash());
+
+// Initialize Passport
+var initPassport = require('./passport/init');
+initPassport(passport);
+
 
 //set port for app
 app.set('port', (process.env.PORT || 3000));
 
-app.use('/', express.static(path.join(__dirname, 'public')));
+//app.use('/', express.static(path.join(__dirname, 'public')));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -42,6 +51,15 @@ app.use(function(req, res, next) {
     res.setHeader('Cache-Control', 'no-cache');
     next();
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+var routes = require('./routes/index')(passport);
+app.use('/', routes);
 
 app.get('/api/messages', function(req, res) {
   fs.readFile(COMMENTS_FILE, function(err, data) {
@@ -78,6 +96,29 @@ app.post('/api/messages', function(req, res) {
       res.json(comments);
     });
   });
+});
+
+
+//get logged in user
+app.get('/api/user_data', function(req, res) {
+
+            if (req.user === undefined) {
+                // The user is not logged in
+                res.json({});
+            } else {
+                res.json({
+                    username: req.user.username
+                });
+            }
+        });
+
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+app.use(function(req, res, next) {
+  res.status(404).send("Sorry, can't find that!");
 });
 
 
