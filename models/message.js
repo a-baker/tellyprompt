@@ -1,9 +1,9 @@
 var mongoose = require('mongoose');
 
 module.exports = mongoose.model('Message',{
-        id: integer,
-    userID: integer,
-    discussionID: integer,
+        ID: Number,
+    userID: Number,
+    discussionID: Number,
     content: String,
-    dateTime: Date
+    dateTime: String
 });

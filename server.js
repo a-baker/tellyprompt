@@ -15,6 +15,7 @@ var io = require('socket.io')(http);
 var dbConfig = require('./db.js');
 var mongoose = require('mongoose');
 mongoose.connect(dbConfig.url);
+var Message = require('./models/message');
 
 
 // Configuring Passport
@@ -97,6 +98,28 @@ app.post('/api/messages/:id', function(req, res) {
       text: req.body.text,
       dateTime: req.body.dateTime,
     };
+
+    //test save to DB
+       var newMessage = new Message();
+      // set the message's local credentials
+        newMessage.id = newComment.id;
+        newMessage.userID = 0;
+        newMessage.discussionID = req.params.id;
+        newMessage.content = newComment.text;
+        newMessage.dateTime = newComment.dateTime;
+
+        // save the message
+        newMessage.save(function(err) {
+            if (err){
+                console.log('Error in Saving message: '+err);
+                throw err;
+            }
+            console.log('message save succesful');
+        });
+
+      //end of DB save
+
+
     comments.push(newComment);
     fs.writeFile(COMMENTS_FILE, JSON.stringify(comments, null, 4), function(err) {
       if (err) {
@@ -107,6 +130,15 @@ app.post('/api/messages/:id', function(req, res) {
     });
   });
 });
+
+app.get('/api/getmessages/:id', function(req, res){
+    Message.find( { discussionID : req.params.id } ).lean().exec(function (err, messages) {
+        return res.end(JSON.stringify(messages));
+    });
+
+});
+
+
 
 //get logged in user
 app.get('/api/user_data', function(req, res) {

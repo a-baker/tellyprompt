@@ -38,6 +38,10 @@ module.exports = function(passport){
 		failureFlash : true
 	}));
 
+    router.get('/', function(req, res){
+        res.redirect('/chat');
+    });
+
 	/* GET Home Page */
 	router.get('/chat', isAuthenticated, function(req, res){
 		res.render('chat', { user: req.user, id: 1 });
