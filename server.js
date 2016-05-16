@@ -8,7 +8,8 @@ var io = require('socket.io')(http);
 
 
 //path to comments file - temporary, to be replaced by database
-var COMMENTS_FILE = path.join(__dirname, 'messages.json');
+
+
 
 //database config
 var dbConfig = require('./db.js');
@@ -61,7 +62,12 @@ app.set('view engine', 'jade');
 var routes = require('./routes/index')(passport);
 app.use('/', routes);
 
-app.get('/api/messages', function(req, res) {
+app.get('/api/messages/:id', function(req, res) {
+
+    var filename = "";
+    if(req.params.id == 1) {filename = "messages.json"} else {filename = 'messages'+req.params.id+'.json';}
+    var COMMENTS_FILE = path.join(__dirname, filename);
+
   fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
       console.error(err);
@@ -71,7 +77,11 @@ app.get('/api/messages', function(req, res) {
   });
 });
 
-app.post('/api/messages', function(req, res) {
+app.post('/api/messages/:id', function(req, res) {
+    var filename = "";
+    if(req.params.id == 1) {filename = "messages.json"} else {filename = 'messages'+req.params.id+'.json';}
+    var COMMENTS_FILE = path.join(__dirname, filename);
+
   fs.readFile(COMMENTS_FILE, function(err, data) {
     if (err) {
       console.error(err);
@@ -97,7 +107,6 @@ app.post('/api/messages', function(req, res) {
     });
   });
 });
-
 
 //get logged in user
 app.get('/api/user_data', function(req, res) {

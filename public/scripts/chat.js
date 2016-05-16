@@ -2,6 +2,8 @@ var socket = io();
 
 var username = "";
 
+var chat_url = "/api/messages/" + chat_id;
+
 $.getJSON("/api/user_data", function(data) {
     // Make sure the data contains the username as expected before using it
     if (data.hasOwnProperty('username')) {
@@ -62,6 +64,7 @@ var MessageBox = React.createClass({
     var newMessages = messages.concat([message]);
     this.setState({data: newMessages});
     $.ajax({
+      //url: this.props.url,
       url: this.props.url,
       dataType: 'json',
       type: 'POST',
@@ -178,6 +181,6 @@ var MessageForm = React.createClass({
 });
 
 ReactDOM.render(
-  <MessageBox url="/api/messages" />,
+  <MessageBox url= {chat_url} />,
   document.getElementById('content')
 );

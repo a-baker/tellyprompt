@@ -21,7 +21,7 @@ module.exports = function(passport){
 
 	/* Handle Login POST */
 	router.post('/login', passport.authenticate('login', {
-		successRedirect: '/',
+		successRedirect: '/chat',
 		failureRedirect: '/login',
 		failureFlash : true
 	}));
@@ -33,14 +33,18 @@ module.exports = function(passport){
 
 	/* Handle Registration POST */
 	router.post('/signup', passport.authenticate('signup', {
-		successRedirect: '/',
+		successRedirect: '/chat',
 		failureRedirect: '/signup',
 		failureFlash : true
 	}));
 
 	/* GET Home Page */
-	router.get('/', isAuthenticated, function(req, res){
-		res.render('chat', { user: req.user });
+	router.get('/chat', isAuthenticated, function(req, res){
+		res.render('chat', { user: req.user, id: 1 });
+	});
+
+    router.get('/chat/:chatid', isAuthenticated, function(req, res){
+		res.render('chat', { user: req.user, id: req.params.chatid });
 	});
 
 	/* Handle Logout */
