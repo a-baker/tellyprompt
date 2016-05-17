@@ -113,11 +113,11 @@ module.exports = function(passport){
                 throw err;
             }
             console.log('message saving succesful');
+            Message.find( { discussionID : req.params.id } ).lean().exec(function (err, messages) {
+            return res.end(JSON.stringify(messages));
+        });
         });
 
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.write(JSON.stringify({ status: OK }));
-            res.end();
     });
 
 
