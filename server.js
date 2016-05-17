@@ -63,83 +63,6 @@ app.set('view engine', 'jade');
 var routes = require('./routes/index')(passport);
 app.use('/', routes);
 
-app.get('/api/messages/:id', function(req, res) {
-
-    var filename = "";
-    if(req.params.id == 1) {filename = "messages.json"} else {filename = 'messages'+req.params.id+'.json';}
-    var COMMENTS_FILE = path.join(__dirname, filename);
-
-  fs.readFile(COMMENTS_FILE, function(err, data) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    res.json(JSON.parse(data));
-  });
-});
-
-app.post('/api/messages/:id', function(req, res) {
-    var filename = "";
-    if(req.params.id == 1) {filename = "messages.json"} else {filename = 'messages'+req.params.id+'.json';}
-    var COMMENTS_FILE = path.join(__dirname, filename);
-
-  fs.readFile(COMMENTS_FILE, function(err, data) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    var comments = JSON.parse(data);
-    // NOTE: In a real implementation, we would likely rely on a database or
-    // some other approach (e.g. UUIDs) to ensure a globally unique id. We'll
-    // treat Date.now() as unique-enough for our purposes.
-    var newComment = {
-      id: Date.now(),
-      author: req.body.author,
-      text: req.body.text,
-      dateTime: req.body.dateTime,
-    };
-
-    //test save to DB
-       var newMessage = new Message();
-      // set the message's local credentials
-        newMessage.id = newComment.id;
-        newMessage.userID = "5728f74f60f2e87b5c4a0f8e";
-        newMessage.discussionID = req.params.id;
-        newMessage.content = newComment.text;
-        newMessage.dateTime = newComment.dateTime;
-
-        // save the message
-        newMessage.save(function(err) {
-            if (err){
-                console.log('Error in Saving message: '+err);
-                throw err;
-            }
-            console.log('message save succesful');
-        });
-
-      //end of DB save
-
-
-    comments.push(newComment);
-    fs.writeFile(COMMENTS_FILE, JSON.stringify(comments, null, 4), function(err) {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-      res.json(comments);
-    });
-  });
-});
-
-app.get('/api/getmessages/:id', function(req, res){
-    Message.find( { discussionID : req.params.id } ).lean().exec(function (err, messages) {
-        return res.end(JSON.stringify(messages));
-    });
-
-});
-
-
-
 //get logged in user
 app.get('/api/user_data', function(req, res) {
 
@@ -148,6 +71,7 @@ app.get('/api/user_data', function(req, res) {
                 res.json({});
             } else {
                 res.json({
+                    userID: req.user._id,
                     username: req.user.username
                 });
             }
@@ -165,8 +89,9 @@ app.use(function(req, res, next) {
 
 io.on('connection', function(socket){
   socket.on('message', function(msg){
-    io.emit('message', msg);
       console.log('message received');
+      io.emit('message', msg);
+      console.log(msg);
   });
 });
 

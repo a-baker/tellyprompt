@@ -86,23 +86,33 @@ module.exports = function(passport){
     });
 
     router.get('/api/messages/username/:name', function(req, res){
-        function getUserQuery(name){
-            var query = User.findOne({username:name});
-            return query;
-        }
-
-        var query = getUserQuery(req.params.name);
-        query.exec(function(err, users){
-            if(err){return console.log(err);}
-            Message.find( { userID : users['_id'] } ).lean().exec(function (err, messages) {
-                return res.end(JSON.stringify(messages));
-            });
+        Message.find( { username : req.params.name } ).lean().exec(function (err, messages) {
+            return res.end(JSON.stringify(messages));
         });
     });
 
     router.get('/api/messages/discussion/:id', function(req, res){
         Message.find( { discussionID : req.params.id } ).lean().exec(function (err, messages) {
             return res.end(JSON.stringify(messages));
+        });
+    });
+
+    router.post('/api/messages/discussion/:id', function(req, res){
+        var message = new Message();
+      // set the message's local credentials
+        message.id = Date.now();
+        message.username = req.body.username;
+        message.discussionID = req.params.id;
+        message.content = req.body.content;
+        message.dateTime = req.body.dateTime;
+
+        // save the message
+        message.save(function(err) {
+            if (err){
+                console.log('Error in Saving message: '+err);
+                throw err;
+            }
+            console.log('message save succesful');
         });
     });
 
