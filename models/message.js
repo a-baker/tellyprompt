@@ -5,5 +5,5 @@ module.exports = mongoose.model('Message',{
     username: String,
     discussionID: Number,
     content: String,
-    dateTime: String
+    dateTime: Date
 });

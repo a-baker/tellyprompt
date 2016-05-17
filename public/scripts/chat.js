@@ -8,15 +8,29 @@ var chat_url = "/api/messages/discussion/" + chat_id;
 $.getJSON("/api/user_data", function(data) {
     // Make sure the data contains the username as expected before using it
     if (data.hasOwnProperty('username')) {
-        console.log('Username: ' + data.username);
         username = data.username;
         userID = data.userID;
-        console.log(userID);
     }
 });
 
 function scrollDown(){
     window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+}
+
+function formatISOString(x){
+    var date = new Date(x);
+    var days = date.getDate();
+    days = (days < 10) ? ("0" + days) : days;
+    var months = date.getMonth();
+    months = (months < 10) ? ("0" + months) : months;
+    var hours = date.getHours();
+    hours = (hours < 10) ? ("0" + hours) : hours;
+    var minutes = date.getMinutes();
+    minutes = (minutes < 10) ? ("0" + minutes) : minutes;
+
+    var formattedDate =
+        days + "/" + months + "/" + date.getFullYear() + " at " + hours + ":" + minutes;
+    return formattedDate;
 }
 
 $( ".postButton" ).click(function() {
@@ -96,9 +110,6 @@ var MessageBox = React.createClass({
     this.loadMessagesFromServer();
     socket.on('message', function(msg){
         this.loadNewMessage(msg);
-
-        console.log(msg);
-        console.log(this.state.data);
     }.bind(this));
   },
   render: function() {
@@ -116,7 +127,7 @@ var MessageList = React.createClass({
   render: function() {
     var messageNodes = this.props.data.map(function(message) {
       return (
-        <Message author={message.username} key={message._id} dateTime={message.dateTime}>
+        <Message author={message.username} key={message._id} dateTime={formatISOString(message.dateTime)}>
           {message.content}
         </Message>
       );
@@ -144,38 +155,13 @@ var MessageForm = React.createClass({
     var author = this.state.author.trim();
     var text = this.state.text.trim();
 
-      //get date
-      var today = new Date();
-      var dd = today.getUTCDate();
-      var mm = today.getUTCMonth()+1; //January is 0!
-      var yyyy = today.getUTCFullYear();
-      var hh = today.getUTCHours();
-      var mn = today.getUTCMinutes();
-
-      if(dd<10) {
-          dd='0'+dd
-      }
-
-      if(mm<10) {
-          mm='0'+mm
-      }
-
-      if(hh<10) {
-          hh='0'+hh
-      }
-
-      if(mn<10) {
-          mn='0'+mn
-      }
-      today = dd+'/'+mm+'/'+yyyy+" @ "+hh+":"+mn;
-
-      var dateTime = today;
-
+    var tempDate = new Date();
+    tempDate = tempDate.toISOString();
 
     if (!text) {
       return;
     }
-    this.props.onMessageSubmit({username: username, content: text, dateTime: dateTime});
+    this.props.onMessageSubmit({username: username, content: text, dateTime: tempDate});
     this.setState({author: '', text: ''});
   },
   render: function() {

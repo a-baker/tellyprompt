@@ -92,19 +92,20 @@ module.exports = function(passport){
     });
 
     router.get('/api/messages/discussion/:id', function(req, res){
-        Message.find( { discussionID : req.params.id } ).lean().exec(function (err, messages) {
+        Message.find( { discussionID : req.params.id } ).sort('dateTime').exec(function (err, messages) {
             return res.end(JSON.stringify(messages));
         });
     });
 
     router.post('/api/messages/discussion/:id', function(req, res){
         var message = new Message();
+        var now = new Date();
       // set the message's local credentials
         message.id = Date.now();
         message.username = req.body.username;
         message.discussionID = req.params.id;
         message.content = req.body.content;
-        message.dateTime = req.body.dateTime;
+        message.dateTime = now.toISOString();
 
         // save the message
         message.save(function(err) {
@@ -113,7 +114,7 @@ module.exports = function(passport){
                 throw err;
             }
             console.log('message saving succesful');
-            Message.find( { discussionID : req.params.id } ).lean().exec(function (err, messages) {
+            Message.find( { discussionID : req.params.id } ).sort('dateTime').lean().exec(function (err, messages) {
             return res.end(JSON.stringify(messages));
         });
         });
