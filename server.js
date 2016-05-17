@@ -103,7 +103,7 @@ app.post('/api/messages/:id', function(req, res) {
        var newMessage = new Message();
       // set the message's local credentials
         newMessage.id = newComment.id;
-        newMessage.userID = 0;
+        newMessage.userID = "5728f74f60f2e87b5c4a0f8e";
         newMessage.discussionID = req.params.id;
         newMessage.content = newComment.text;
         newMessage.dateTime = newComment.dateTime;
