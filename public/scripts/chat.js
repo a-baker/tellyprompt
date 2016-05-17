@@ -15,7 +15,7 @@ $.getJSON("/api/user_data", function(data) {
     }
 });
 
-funtion scrollDown(){
+function scrollDown(){
     window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
 }
 
