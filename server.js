@@ -36,7 +36,7 @@ initPassport(passport);
 
 
 //set port for app
-app.set('port', (process.env.PORT || 3000));
+app.set('port', (process.env.PORT || 80));
 
 //app.use('/', express.static(path.join(__dirname, 'public')));
 
