@@ -15,6 +15,14 @@ $.getJSON("/api/user_data", function(data) {
     }
 });
 
+funtion scrollDown(){
+    window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+}
+
+$( ".postButton" ).click(function() {
+  scrollDown();
+});
+
 var Message = React.createClass({
   rawMarkup: function() {
     var rawMarkup = marked(this.props.children.toString(), {sanitize: true});
@@ -54,6 +62,7 @@ var MessageBox = React.createClass({
       var messages = this.state.data;
       var newMessages = messages.concat([message]);
       this.setState({data:newMessages});
+      scrollDown();
   },
   handleMessageSubmit: function(message) {
     var messages = this.state.data;
