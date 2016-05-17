@@ -6,6 +6,10 @@ h1, h2.commentAuthor {
     color: #22264b;
 }
 
+div#content {
+    padding-top: 75px;
+}
+
 span.postTime {
     color: #8b8b8b;
     font-weight: 300;
@@ -33,6 +37,22 @@ span.postTime {
     color: white;
     font-size: 15px;
     text-transform: uppercase;
+}
+
+.titleContainer {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    background-color: #2ecc71;
+    padding-left: 30px;
+    height: 75px;
+    border-bottom: 5px solid rgba(0,0,0,0.1);
+}
+
+.titleContainer h1 {
+    border: none;
+    color: #f7f7f7;
 }
 
 .messageList {
