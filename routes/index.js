@@ -112,8 +112,12 @@ module.exports = function(passport){
                 console.log('Error in Saving message: '+err);
                 throw err;
             }
-            console.log('message save succesful');
+            console.log('message saving succesful');
         });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.write(JSON.stringify({ status: OK }));
+            res.end();
     });
 
 
