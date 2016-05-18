@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var shortid = require('shortid');
 
 
 //path to comments file - temporary, to be replaced by database
@@ -15,7 +16,7 @@ var io = require('socket.io')(http);
 var dbConfig = require('./db.js');
 var mongoose = require('mongoose');
 mongoose.connect(dbConfig.url);
-var Message = require('./models/message');
+//var Message = require('./models/message');
 
 
 // Configuring Passport

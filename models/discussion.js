@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
+var shortid = require('shortid');
 
 module.exports = mongoose.model('Discussion',{
-        ID: Number,
+        _id: {type: String, 'default': shortid.generate},
     topic: String,
-    userID: Number,
+    username: String,
     episodeID: Number,
     dateTime: Date
 });

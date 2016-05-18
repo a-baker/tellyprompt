@@ -58,7 +58,21 @@ module.exports = function(passport){
 	});
 
     router.get('/chat/:chatid', isAuthenticated, function(req, res){
-		res.render('chat', { user: req.user, id: req.params.chatid });
+
+        Discussion.findOne( { _id : req.params.chatid } ).lean().exec(function (err, discussions) {
+
+            if (err){
+                console.log('Error: '+err);
+                throw err;
+            }
+
+            if(discussions !== null){
+                res.render('chat', { user: req.user, id: req.params.chatid, topic: discussions.topic });
+            } else {
+                res.status(404).send("Sorry, that discussion doesn't exist!");
+            }
+        });
+
 	});
 
 	/* Handle Logout */
@@ -82,6 +96,38 @@ module.exports = function(passport){
     router.get('/api/users/username/:name', function(req, res){
         User.findOne( { username : req.params.name } ).lean().exec(function (err, users) {
             return res.end(JSON.stringify(users));
+        });
+    });
+
+    router.get('/api/discussions/username/:name', function(req, res){
+        Discussion.find( { username : req.params.name } ).lean().exec(function (err, discussions) {
+            console.log("discussions: ", discussions);
+            return res.end(JSON.stringify(discussions));
+        });
+    });
+
+    router.get('/api/discussions/episode/:episode', function(req, res){
+        Discussion.find( { episodeID : req.params.episode } ).lean().exec(function (err, discussions) {
+            return res.end(JSON.stringify(discussions));
+        });
+    });
+
+    router.get('/api/discussions/add/:topic/:user/:episode/', function(req, res){
+        var now = new Date()
+        var discussion = new Discussion();
+        discussion.username = req.params.user;
+        discussion.topic = req.params.topic;
+        discussion.episodeID = req.params.episode;
+        discussion.dateTime = now.toISOString();
+
+        // save the discussion
+        discussion.save(function(err) {
+            if (err){
+                console.log('Error in Saving discussion: '+err);
+                throw err;
+            }
+            console.log('discussion saving succesful');
+            return res.end("Saved!");
         });
     });
 
@@ -120,7 +166,6 @@ module.exports = function(passport){
         });
 
     });
-
 
 	return router;
 }
