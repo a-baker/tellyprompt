@@ -1,0 +1,15 @@
+extends layout
+
+mixin discussionbox(x)
+    li.discussion
+        a(href='../chat/' + x._id)= x.topic
+        p= 'In episode: ' + x.episodeID
+        p= 'By: ' + x.username + ' at ' + x.dateTime
+
+block content
+    
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js")
+    
+    ul.discussions
+        each discussion in discussions
+            +discussionbox(discussion)

@@ -49,7 +49,13 @@ module.exports = function(passport){
 	}));
 
     router.get('/', function(req, res){
-        res.redirect('/chat');
+        res.redirect('/discussions');
+    });
+
+    router.get('/discussions', isAuthenticated, function(req, res){
+        Discussion.find( {  } ).lean().exec(function (err, discussions) {
+            res.render('discussions', {discussions: discussions});
+        });
     });
 
 	/* GET Home Page */
