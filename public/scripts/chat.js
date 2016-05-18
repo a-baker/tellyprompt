@@ -115,7 +115,6 @@ var MessageBox = React.createClass({
   render: function() {
     return (
       <div className="messageBox">
-        <h1>Messages</h1>
         <MessageList data={this.state.data} />
         <MessageForm onMessageSubmit={this.handleMessageSubmit} />
       </div>

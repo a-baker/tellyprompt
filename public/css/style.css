@@ -1,5 +1,6 @@
 body{
     padding-top: 0;
+    padding: 0;
 }
 
 h1, h2.commentAuthor {
@@ -57,6 +58,34 @@ span.postTime {
 
 .messageList {
     padding-bottom: 50px;
+}
+
+.message {
+    padding: 0 30px;
+}
+
+h2.messageAuthor {
+    padding-top: 10px;
+    margin-top: 0;
+    border: none;
+    font-size: 24px;
+    color: #2AB866;
+}
+
+.message p {
+    padding-bottom: 10px;
+    margin-bottom: 0;
+    font-size: 22px;
+}
+
+.message.dark {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.message:nth-of-type(even) {
+    background-color: #F9F9F9;
+    border-top: 2px solid #F5f5f5;
+    border-bottom: 2px solid #F5F5F5;
 }
 
 .messageForm {
