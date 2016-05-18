@@ -117,3 +117,22 @@ h2.messageAuthor {
     border-left: #2eb366 2px solid;
     font-size: 18px;
 }
+
+/*  DISCUSSIONS PAGE  */
+
+ul.discussions {
+    padding: 0;
+}
+
+li.discussion {
+    list-style-type: none;
+    padding: 20px 20px;
+}
+
+li.discussion:nth-of-type(odd) {
+    background-color: rgba(46, 204, 113, 0.16);
+}
+
+li.discussion a {
+    font-size: 18px;
+}
