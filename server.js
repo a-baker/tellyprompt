@@ -88,9 +88,15 @@ app.use(function(req, res, next) {
 
 
 io.on('connection', function(socket){
+  socket.on('joinRoom', function(data) {
+      socket.join(data.room);
+      io.sockets.in(data.room).emit("userJoined", data.name)
+  });
+
+
   socket.on('message', function(msg){
       console.log('message received');
-      io.emit('message', msg);
+      io.sockets.in(msg.room).emit('message', msg);
       console.log(msg);
   });
 });

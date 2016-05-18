@@ -98,8 +98,13 @@ var MessageBox = React.createClass({
   },
   componentDidMount: function() {
     this.loadMessagesFromServer();
+      socket.emit("joinRoom", {room: chat_id, name: username});
     socket.on('message', function(msg){
         this.loadNewMessage(msg);
+    }.bind(this));
+
+    socket.on('userJoined', function(user){
+        console.log(user + " joined the discussion.");
     }.bind(this));
   },
   render: function() {
@@ -150,7 +155,7 @@ var MessageForm = React.createClass({
     if (!text) {
       return;
     }
-    this.props.onMessageSubmit({username: username, content: text, dateTime: tempDate});
+    this.props.onMessageSubmit({username: username, content: text, dateTime: tempDate, room: chat_id});
     this.setState({author: '', text: ''});
   },
   render: function() {
