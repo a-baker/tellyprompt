@@ -1,17 +1,7 @@
 var socket = io();
 
-var username = "";
-var userID = "";
-
+var username = localUser;
 var chat_url = "/api/messages/discussion/" + chat_id;
-
-$.getJSON("/api/user_data", function(data) {
-    // Make sure the data contains the username as expected before using it
-    if (data.hasOwnProperty('username')) {
-        username = data.username;
-        userID = data.userID;
-    }
-});
 
 function scrollDown(){
     window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
