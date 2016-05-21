@@ -5,3 +5,8 @@ block content
     
     h1= data.show + " S" + data.season + "E" + data.episode + ": " + data.title
     img(src="#{data.still}")
+    div.row.ep-row
+        div.col-sm-6.vcenter-col.still-col
+            img.ep-still(src="#{data.still}")
+        div.col-sm-6.vcenter-col.desc-col
+            p.ep-desc= "S" + data.season + "E" + data.episode + ": " + data.title

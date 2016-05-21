@@ -167,6 +167,46 @@ module.exports = function(passport){
             });
     });
 
+    router.get('/season/:show/:season', function(req, res){
+
+        var series = req.params.show;
+        var season = req.params.season;
+
+        //GET SEASON
+         unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "?api_key=" + APIKEY)
+            .send()
+            .end(response=> {
+                if (response.ok) {
+                    var showseason = response.body;
+
+                        //GET SHOW
+                        unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + APIKEY)
+                            .send()
+                            .end(response=> {
+                                if (response.ok) {
+                                    var show = response.body;
+
+                                    var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path};
+
+                                    showseason.episodes.forEach(function(item, index){
+                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/w300" + item.still_path });
+                                    });
+
+                                    res.render('season', {data: seasonData});
+
+
+                                } else {
+                                    console.log("Got an error: ", response.error);
+                                    res.end("Sorry, there was a problem loading that season.");
+                                }
+                            });
+                } else {
+                    console.log("Got an error: ", response.error);
+                    res.end("Sorry, there was a problem loading that season.");
+                }
+            });
+    });
+
     router.get('/show/search/:name', function(req, res){
         getShowInfo(req.params.name, function(info){
             res.send(info);

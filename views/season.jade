@@ -1,0 +1,14 @@
+extends layout
+
+mixin episode(ep)
+    div.row.ep-row
+            div.col-sm-6.vcenter-col.still-col
+                img.ep-still(src="#{ep.still}")
+            div.col-sm-6.vcenter-col.desc-col
+                p.ep-desc= "S" + data.season + "E" + ep.episode + ": " + ep.title
+                
+block content
+    div.showHeader(style="background-image: url(#{data.backdrop})")
+        h1= data.show + " Season " + data.season
+    each ep in data.episodes
+        +episode(ep)
