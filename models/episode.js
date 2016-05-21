@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
 
 module.exports = mongoose.model('Episode',{
-        ID: Number,
+        _id: String,
     showID: Number,
     title: String,
     date: Date,
-    season: Number
+    season: Number,
+    number: Number
 });

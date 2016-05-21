@@ -7,9 +7,12 @@ var Discussion = require('../models/discussion');
 var Episode = require('../models/episode');
 var Show = require('../models/show');
 var User = require('../models/user');
+var unirest = require('unirest');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
+//themoviedb api key
+var APIKEY = "ad3cf5b87d8ad52d68ce61f54f36087f";
 
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler
@@ -19,6 +22,46 @@ var isAuthenticated = function (req, res, next) {
 		return next();
 	// if the user is not authenticated then redirect him to the login page
 	res.redirect('/login');
+}
+
+function getShowInfo(search, callback){
+
+    var obj = {"title": "", id: 0, poster:"", "seasons": []};
+
+    unirest.get("https://api.themoviedb.org/3/search/tv?query=" + search + "&api_key=" + APIKEY)
+                    .send()
+                    .end(response=> {
+                        if (response.ok) {
+                            var data = response.body;
+                            if(data.total_results > 0){
+                                var id = data.results[0].id;
+                                obj.id = id;
+                                unirest.get("https://api.themoviedb.org/3/tv/" + id + "?api_key=" + APIKEY)
+                                    .send()
+                                    .end(response=> {
+                                        if (response.ok) {
+                                            var data = response.body;
+                                            obj.title = data.name;
+                                            obj.poster = data.poster_path;
+                                            var seasons = data.seasons;
+                                            seasons.forEach(function(item,index){
+                                                obj.seasons.push({"season": item.season_number, "episodes": item.episode_count, "poster": item.poster_path});
+                                            });
+
+                                            callback(obj);
+
+                                        } else {
+                                            console.log("Error getting show: ", response.error);
+                                        }
+                                    });
+                            } else {
+                                callback("No shows found with the name " + search + ".");
+                                return;
+                            }
+                        } else {
+                            console.log("Error in search: ", response.error);
+                        }
+                    });
 }
 
 module.exports = function(passport){
@@ -43,7 +86,7 @@ module.exports = function(passport){
 
 	/* Handle Registration POST */
 	router.post('/signup', passport.authenticate('signup', {
-		successRedirect: '/chat',
+		successRedirect: '/',
 		failureRedirect: '/signup',
 		failureFlash : true
 	}));
@@ -80,6 +123,55 @@ module.exports = function(passport){
         });
 
 	});
+
+     router.get('/episode/:id', function(req, res){
+        var epstring = req.params.id;
+
+        var s = epstring.indexOf("s");
+        var e = epstring.indexOf("e");
+
+        var series = epstring.substring(0,s);
+        var season = epstring.substring(s+1, e);
+        var episode = epstring.substring(e+1, epstring.length);
+
+
+
+         //GET EPISODE
+         unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "/episode/" + episode + "?api_key=" + APIKEY)
+            .send()
+            .end(response=> {
+                if (response.ok) {
+                    var ep = response.body;
+
+                        //GET SHOW
+                        unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + APIKEY)
+                            .send()
+                            .end(response=> {
+                                if (response.ok) {
+                                    var show = response.body;
+
+                                    var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": "http://image.tmdb.org/t/p/w300" + ep.still_path};
+
+                                    res.render('episode', {data: showData});
+
+
+                                } else {
+                                    console.log("Got an error: ", response.error);
+                                    res.end("Sorry, there was a problem loading that episode.");
+                                }
+                            });
+                } else {
+                    console.log("Got an error: ", response.error);
+                    res.end("Sorry, there was a problem loading that episode.");
+                }
+            });
+    });
+
+    router.get('/show/search/:name', function(req, res){
+        getShowInfo(req.params.name, function(info){
+            res.send(info);
+        });
+    });
 
 	/* Handle Logout */
 	router.get('/signout', function(req, res) {
