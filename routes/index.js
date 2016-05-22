@@ -189,7 +189,7 @@ module.exports = function(passport){
                                     var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path};
 
                                     showseason.episodes.forEach(function(item, index){
-                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/w300" + item.still_path });
+                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + item.still_path });
                                     });
 
                                     res.render('season', {data: seasonData});

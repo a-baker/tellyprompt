@@ -2,9 +2,10 @@ extends layout
 
 mixin episode(ep)
     div.row.ep-row
-            div.col-sm-6.vcenter-col.still-col
-                img.ep-still(src="#{ep.still}")
-            div.col-sm-6.vcenter-col.desc-col
+            div.still-col
+                if ep.still !== "/img/nostill.jpg"
+                    img.ep-still(src="#{ep.still}")
+            div.col-sm-12.desc-col
                 p.ep-desc= "S" + data.season + "E" + ep.episode + ": " + ep.title
                 
 block content
