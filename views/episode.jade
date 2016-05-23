@@ -1,12 +1,5 @@
-extends layout
-
-
-block content
-    
-    h1= data.show + " S" + data.season + "E" + data.episode + ": " + data.title
-    img(src="#{data.still}")
-    div.row.ep-row
-        div.still-col
-            img.ep-still(src="#{data.still}")
-        div.col-sm-12.desc-col
-            p.ep-desc= data.show + " S" + data.season + "E" + data.episode + ": " + data.title
+div.row.ep-row
+    div.still-col
+        img.ep-still(src="#{data.still}")
+    div.col-sm-12.desc-col
+        p.ep-desc= data.show + " S" + data.season + "E" + data.episode + ": " + data.title

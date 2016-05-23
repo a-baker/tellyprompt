@@ -1,10 +1,11 @@
 mixin episode(ep)
-    div.row.ep-row
-            div.still-col
-                if ep.still !== "/img/nostill.jpg"
-                    img.ep-still(src="#{ep.still}")
-            div.col-sm-12.desc-col
-                p.ep-desc= "S" + data.season + "E" + ep.episode + ": " + ep.title
+    a(href="/chat/" + data.showID + "/" + data.season + "/" + ep.episode)
+        div.row.ep-row
+                div.still-col
+                    if ep.still !== "/img/nostill.jpg"
+                        img.ep-still(src="#{ep.still}")
+                div.col-sm-12.desc-col
+                    p.ep-desc= "S" + data.season + "E" + ep.episode + ": " + ep.title
                 
 //div.showHeader(style="background-image: url(#{data.backdrop})")
 //    h1= data.show + " Season " + data.season

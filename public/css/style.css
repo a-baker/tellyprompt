@@ -8,7 +8,7 @@ h1, h2.commentAuthor {
 }
 
 div#content {
-    padding-top: 75px;
+    padding-top: 90px;
 }
 
 span.postTime {
@@ -45,10 +45,12 @@ span.postTime {
     width: 100%;
     left: 0;
     top: 0;
+/*
     background-color: #2ecc71;
     padding-left: 30px;
     height: 75px;
     border-bottom: 5px solid rgba(0,0,0,0.1);
+*/
 }
 
 .titleContainer h1 {
@@ -139,6 +141,37 @@ li.discussion a {
 
 
 /*  EPISODE LISTING  */
+
+.searchForm {
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2000;
+    background-color: rgba(255,255,255,0.8);
+}
+
+.searchBox {
+    padding: 6px 15px 6px 30px;
+    margin: 0 auto;
+    display: block;
+    border-radius: 100px;
+    border: 1px solid #A0A0A0;
+    font-size: 20px;
+    outline: none;
+    background-image: url('/img/search.png');
+    background-repeat: no-repeat;
+    background-size: 19px;
+    background-position: 7px 10px;
+    width: 90%;
+    box-sizing: border-box;
+}
+
+.series {
+    margin-top: 62px;
+}
+
 .ep-row {
     margin: 0;
     border-bottom: solid 2px #EAEAEA;
@@ -214,4 +247,8 @@ p.ep-desc {
 
 .seasonWrapper {
     display: none;
+}
+
+.bar {
+    background-color: #000;
 }
