@@ -8,7 +8,7 @@ h1, h2.commentAuthor {
 }
 
 div#content {
-    padding-top: 90px;
+    padding-top: 0;
 }
 
 span.postTime {
@@ -41,7 +41,7 @@ span.postTime {
 }
 
 .titleContainer {
-    position: fixed;
+    position: relative;
     width: 100%;
     left: 0;
     top: 0;
