@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    div.search
+        form.searchForm
+            input(type="text", placeholder="Search for a show...").searchBox
+            input(type="submit", value="Search").searchButton
+    div.series
+    
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js")
+    script(type='text/javascript', src="/scripts/nanobar.min.js")
+    script(type='text/javascript', src="/scripts/season.js")
+    script(type='text/javascript', src="/scripts/search.js")
+    

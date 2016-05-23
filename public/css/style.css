@@ -182,13 +182,36 @@ p.ep-desc {
     background-size: cover;
     background-position: center;
     border-bottom: 2px solid #f7f7f7;
+    position: relative;
+    background-color: #272727;
+    height: 200px;
 }
 
 .showHeader h1 {
-    margin: 80px 30px;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
     display: inline-block;
     border: none;
-    background-color: rgba(0,0,0,0.4);
     color: #f7f7f7;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 45px;
+    z-index: 100;
+}
+
+.seasonImg{
+    opacity: 0.5;
+    position: absolute;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.seasonWrapper {
+    display: none;
 }

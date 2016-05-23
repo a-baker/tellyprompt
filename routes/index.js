@@ -8,6 +8,7 @@ var Episode = require('../models/episode');
 var Show = require('../models/show');
 var User = require('../models/user');
 var unirest = require('unirest');
+var async = require('async');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -62,6 +63,54 @@ function getShowInfo(search, callback){
                             console.log("Error in search: ", response.error);
                         }
                     });
+}
+
+function getSeasonInfo(series, season, callback){
+    //GET SEASON
+         unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "?api_key=" + APIKEY)
+            .send()
+            .end(response=> {
+                if (response.ok) {
+                    var showseason = response.body;
+
+                        //GET SHOW
+                        unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + APIKEY)
+                            .send()
+                            .end(response=> {
+                                if (response.ok) {
+                                    var show = response.body;
+
+                                    var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path};
+
+                                    showseason.episodes.forEach(function(item, index){
+                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + item.still_path });
+                                    });
+
+                                    callback(seasonData);
+
+                                } else {
+                                    console.log("Got an error: ", response.error);
+                                    res.end("Sorry, there was a problem loading that season.");
+                                }
+                            });
+                } else {
+                    console.log("Got an error: ", response.error);
+                    res.end("Sorry, there was a problem loading that season.");
+                }
+            });
+}
+
+function getSeasons(series, callback){
+    var seriesData = {"title": series.title, "id": series.id, seasons: []};
+    async.eachSeries(series.seasons, function(item, cb){
+        getSeasonInfo(series.id, item.season, function(data){
+            var season = {"season": data.season, "episodes": data.episodes};
+            seriesData.seasons.push(season);
+            cb();
+        });
+    }, function(){
+            callback(seriesData);
+    });
 }
 
 module.exports = function(passport){
@@ -168,49 +217,33 @@ module.exports = function(passport){
     });
 
     router.get('/season/:show/:season', function(req, res){
-
         var series = req.params.show;
         var season = req.params.season;
 
-        //GET SEASON
-         unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "?api_key=" + APIKEY)
-            .send()
-            .end(response=> {
-                if (response.ok) {
-                    var showseason = response.body;
-
-                        //GET SHOW
-                        unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + APIKEY)
-                            .send()
-                            .end(response=> {
-                                if (response.ok) {
-                                    var show = response.body;
-
-                                    var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path};
-
-                                    showseason.episodes.forEach(function(item, index){
-                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + item.still_path });
-                                    });
-
-                                    res.render('season', {data: seasonData});
+        getSeasonInfo(series, season, function(data){
+            res.render('season', {data: data});
+        })
 
 
-                                } else {
-                                    console.log("Got an error: ", response.error);
-                                    res.end("Sorry, there was a problem loading that season.");
-                                }
-                            });
-                } else {
-                    console.log("Got an error: ", response.error);
-                    res.end("Sorry, there was a problem loading that season.");
-                }
-            });
     });
 
     router.get('/show/search/:name', function(req, res){
         getShowInfo(req.params.name, function(info){
             res.send(info);
         });
+    });
+
+    router.get('/show/:name', function(req, res){
+        var seriesData = {seasons:[]};
+        getShowInfo(req.params.name, function(info){
+            getSeasons(info, function(data){
+                res.send(data);
+            });
+        });
+    });
+
+    router.get('/search', function(req, res){
+        res.render('search');
     });
 
 	/* Handle Logout */

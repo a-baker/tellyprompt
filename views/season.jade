@@ -1,5 +1,3 @@
-extends layout
-
 mixin episode(ep)
     div.row.ep-row
             div.still-col
@@ -8,8 +6,9 @@ mixin episode(ep)
             div.col-sm-12.desc-col
                 p.ep-desc= "S" + data.season + "E" + ep.episode + ": " + ep.title
                 
-block content
-    div.showHeader(style="background-image: url(#{data.backdrop})")
-        h1= data.show + " Season " + data.season
-    each ep in data.episodes
-        +episode(ep)
+//div.showHeader(style="background-image: url(#{data.backdrop})")
+//    h1= data.show + " Season " + data.season
+    
+//div.seasonWrapper
+each ep in data.episodes
+    +episode(ep)
