@@ -15,17 +15,19 @@ function scrollTop(){
     }, 100);
 }
 
-//$(document).ajaxSend(function () {
-//    bar.go(30);
-//}).ajaxComplete(function () {
-//    bar.go(100);
-//});
-
-$('.searchForm').submit(function(e){
-    e.preventDefault();
+function update (e, h){
+    if(e) { e.preventDefault(); }
     var searchTerm = $('.searchBox').val();
-
+    if (searchTerm == "" || searchTerm == null){
+        if(h){$('.series').html("")}
+        return;
+    }
+    $('.errBar').removeClass('show');
     bar.go(30);
+
+    if (!h && searchTerm !== window.history.state.term) {
+        window.history.pushState({term: searchTerm}, "", searchTerm);
+    }
 
     $.ajax({
         url: "/show/search/" + searchTerm,
@@ -34,7 +36,6 @@ $('.searchForm').submit(function(e){
             if(res !== "Sorry, there was a problem loading that show.") {
                 if(res !== "No shows found with the name " + searchTerm + ".") {
                     showID = res.id;
-                    console.log(res);
                     var length = res.seasons.length;
                     $('.series').html("");
 
@@ -63,13 +64,22 @@ $('.searchForm').submit(function(e){
                                 type: 'GET',
                                 async: true,
                                 success: function(res) {
-                                      var text = res;
-                                    div.append(text);
-                                    thisseason.data("loaded", true);
+                                    var text = res;
 
-                                    bar.go(100);
+                                    if(text == "Sorry, there was a problem loading that season.") {
+                                        $('.errText').html(res);
+                                        $('.errBar').addClass('show');
+                                        bar.go(100);
+                                        return;
+                                    } else {
+                                        div.append(text);
+                                        thisseason.data("loaded", true);
 
-                                    div.toggle();
+                                        bar.go(100);
+
+                                        div.toggle();
+                                        $('.errBar').removeClass('show');
+                                    }
                                 }
                             });
                         } else {
@@ -77,15 +87,43 @@ $('.searchForm').submit(function(e){
                         }
                     });
                 } else {
-                    alert(res);
+                    $('.errText').html(res);
+                    $('.errBar').addClass('show');
                     bar.go(100);
                 }
             } else {
-                alert('Sorry, there was a problem loading that show. Please try again in a moment.')
+                $('.errText').html('Sorry, there was a problem loading that show. Please try again in a moment.');
+                $('.errBar').addClass('show');
                 bar.go(100);
             }
-
-
         }
     });
+}
+
+$('.searchForm').submit(function(e){
+    update(e, null);
 });
+
+$('.errBar').click(function(){
+    $(this).removeClass('show');
+});
+
+$(document).ready(function(){
+
+   if (defaultSearch){
+       $('.searchBox').val(defaultSearch);
+       $('.searchForm').submit();
+   }
+
+    history.replaceState({term: defaultSearch},'', window.location);
+});
+
+$(window).bind("popstate", function(event) {
+    var state = event.originalEvent.state;
+        if (state != null){
+            if ('term' in state){
+                $('.searchBox').val(state.term);
+                update(null, true);
+            }
+        }
+    });

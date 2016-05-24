@@ -25,6 +25,11 @@ var isAuthenticated = function (req, res, next) {
 	res.redirect('/login');
 }
 
+var handleOnlyXhr = function(req, res, next) {
+  if (req.xhr) return next();
+  res.redirect('/');
+}
+
 function getShowInfo(search, callback){
 
     var obj = {"title": "", id: 0, poster:"", "seasons": []};
@@ -240,7 +245,7 @@ module.exports = function(passport){
         });
     });
 
-    router.get('/season/:show/:season', function(req, res){
+    router.get('/season/:show/:season', handleOnlyXhr, function(req, res){
         var series = req.params.show;
         var season = req.params.season;
 
@@ -256,7 +261,7 @@ module.exports = function(passport){
 
     });
 
-    router.get('/show/search/:name', function(req, res){
+    router.get('/show/search/:name', handleOnlyXhr, function(req, res){
         getShowInfo(req.params.name, function(err, info){
             if(!err){
                 res.send(info);
@@ -266,7 +271,7 @@ module.exports = function(passport){
         });
     });
 
-    router.get('/show/:name', function(req, res){
+    router.get('/show/:name', handleOnlyXhr, function(req, res){
         var seriesData = {seasons:[]};
         getShowInfo(req.params.name, function(err, info){
             if(!err){
@@ -280,7 +285,11 @@ module.exports = function(passport){
     });
 
     router.get('/search', function(req, res){
-        res.render('search');
+        res.render('search', {defaultSearch: null});
+    });
+
+    router.get('/search/:term', function(req, res){
+        res.render('search', {defaultSearch: req.params.term});
     });
 
 	/* Handle Logout */

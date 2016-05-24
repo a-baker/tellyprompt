@@ -168,6 +168,31 @@ li.discussion a {
     box-sizing: border-box;
 }
 
+.errBar {
+    position: absolute;
+    width: 85%;
+    left: 50%;
+    z-index: 10000;
+    border-radius: 100px;
+    text-align: center;
+    display: block;
+    background-color: firebrick;
+    transition: transform ease-in-out 0.1s;
+    transform: translate(-50%, -100%);
+    z-index: -1;
+}
+
+.errBar.show {
+    transform: translateX(-50%);
+}
+
+span.errText {
+    color: #f7f7f7;
+    display: inline-block;
+    margin: 2px 5px;
+    font-size: 12px;
+}
+
 .series {
     margin-top: 62px;
 }
