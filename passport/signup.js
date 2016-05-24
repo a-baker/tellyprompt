@@ -11,7 +11,7 @@ module.exports = function(passport){
 
             findOrCreateUser = function(){
                 // find a user in Mongo with provided username
-                User.findOne({ 'username' :  username }, function(err, user) {
+                User.findOne({ 'username_lower' :  username.toLowerCase() }, function(err, user) {
                     // In case of any error, return using the done method
                     if (err){
                         console.log('Error in SignUp: '+err);
@@ -28,6 +28,7 @@ module.exports = function(passport){
 
                         // set the user's local credentials
                         newUser.username = username;
+                        newUser.username_lower = username.toLowerCase();
                         newUser.password = createHash(password);
                         newUser.email = req.param('email');
                         newUser.firstName = req.param('firstName');

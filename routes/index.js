@@ -305,13 +305,13 @@ module.exports = function(passport){
         //var userID = new ObjectId(req.params.id);
         var userID = req.params.id;
         console.log(userID);
-        User.findOne( { "_id" : userID } ).lean().exec(function (err, users) {
+        User.findOne( { "_id" : userID }, {password: 0, _id: 0, __v: 0} ).lean().exec(function (err, users) {
             return res.end(JSON.stringify(users));
         });
     });
 
     router.get('/api/users/username/:name', function(req, res){
-        User.findOne( { username : req.params.name } ).lean().exec(function (err, users) {
+        User.findOne( { username : req.params.name }, {password: 0, _id: 0, __v: 0} ).lean().exec(function (err, users) {
             return res.end(JSON.stringify(users));
         });
     });
