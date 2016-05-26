@@ -1,0 +1,15 @@
+extends layout
+
+mixin episode(ep)
+    a(href="/chat/" + ep.showID + "/" + ep.season + "/" + ep.episode).chatLink
+        div.row.ep-row
+                div.still-col
+                    if ep.still !== "/img/nostill.jpg"
+                        img.ep-still(src="#{ep.still}")
+                div.col-sm-12.desc-col
+                    p.ep-desc= ep.show + " S" + ep.season + "E" + ep.episode + ": " + ep.title
+                
+block content
+    div.favouritesWrapper
+        each ep in data.episodes
+            +episode(ep)

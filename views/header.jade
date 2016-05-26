@@ -1,0 +1,28 @@
+.navbar.navbar-default(role='navigation')
+      .container
+        .navbar-header
+          button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.navbar-brand(href='/') tellyprompt
+        .navbar-collapse.collapse
+          ul.nav.navbar-nav.navbar-right
+            li.active
+              a(href='/favourites', title='Favourites').btn_fav
+                i.fa.fa-heart
+                span Favourites
+            li
+              a(href='/popular', title='Popular').btn_popular
+                i.fa.fa-line-chart
+                span Popular
+            li
+              a(href='/search', title='Search').btn_search
+                i.fa.fa-search
+                span Search
+            li
+              a(href="/signout", title='Sign out').btn_signout
+                i.fa.fa-sign-out
+                span Sign out
+        // /.nav-collapse

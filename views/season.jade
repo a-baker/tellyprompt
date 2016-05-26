@@ -1,5 +1,5 @@
 mixin episode(ep)
-    a(href="/chat/" + data.showID + "/" + data.season + "/" + ep.episode)
+    a(href="/chat/" + data.showID + "/" + data.season + "/" + ep.episode).chatLink
         div.row.ep-row
                 div.still-col
                     if ep.still !== "/img/nostill.jpg"

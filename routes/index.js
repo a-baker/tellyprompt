@@ -7,6 +7,7 @@ var Discussion = require('../models/discussion');
 var Episode = require('../models/episode');
 var Show = require('../models/show');
 var User = require('../models/user');
+var Favourite = require('../models/favourite');
 var unirest = require('unirest');
 var async = require('async');
 
@@ -149,7 +150,7 @@ function getEpisodeInfo(id, callback){
                             if (response.ok) {
                                 var show = response.body;
 
-                                var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": "http://image.tmdb.org/t/p/original" + ep.still_path};
+                                var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": "http://image.tmdb.org/t/p/original" + ep.still_path, "showID": show.id};
 
                                 callback(null, showData);
 
@@ -166,12 +167,31 @@ function getEpisodeInfo(id, callback){
         });
 }
 
+function getFavourites(username, callback){
+    var favouritesData = {episodes: []};
+    Favourite.find( { username: username } ).lean().exec(function (err, favourites) {
+        async.eachSeries(favourites, function(item, cb){
+            getEpisodeInfo(item.discussionID, function(err, data){
+                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                favouritesData.episodes.push(ep);
+                cb();
+            });
+        }, function(){
+            if(!err){
+                callback(null, favouritesData);
+            } else {
+                callback(err);
+            }
+        });
+    });
+}
+
 module.exports = function(passport){
 
 	/* GET login page. */
 	router.get('/login', function(req, res) {
     	// Display the Login page with any flash message, if any
-		res.render('index', { message: req.flash('message') });
+		res.render('login', { message: req.flash('message') });
 	});
 
 	/* Handle Login POST */
@@ -193,8 +213,8 @@ module.exports = function(passport){
 		failureFlash : true
 	}));
 
-    router.get('/', function(req, res){
-        res.redirect('/search');
+    router.get('/', isAuthenticated, function(req, res){
+        res.render('index', {username: req.user.username});
     });
 
     router.get('/discussions', isAuthenticated, function(req, res){
@@ -292,6 +312,16 @@ module.exports = function(passport){
         res.render('search', {defaultSearch: req.params.term});
     });
 
+    router.post('/favourites', function(req, res){
+        getFavourites(req.body.username, function(err, info){
+           if(!err){
+               res.render('favourites', {data: info});
+           } else {
+               res.send(err);
+           }
+        });
+    });
+
 	/* Handle Logout */
 	router.get('/signout', function(req, res) {
 		req.logout();
@@ -382,6 +412,39 @@ module.exports = function(passport){
         });
         });
 
+    });
+
+    router.post('/api/favourites/:id', function(req, res) {
+        var username = req.body.username;
+        var discussionID = req.params.id;
+        Favourite.findOne({ 'username' :  username, 'discussionID': discussionID }, function(err, favourite) {
+            // In case of any error, return using the done method
+            if (err){
+                console.log('Error adding to favourites: '+err);
+                return err;
+            }
+            // already exists
+            if (favourite) {
+                Favourite.remove({ 'username' :  username, 'discussionID': discussionID }, function(err, favourite){
+                    if (err) return err;
+                    res.send({favourite: 0});
+                });
+            } else {
+                var newFavourite = new Favourite();
+
+                newFavourite.username = username;
+                newFavourite.discussionID = discussionID;
+                // save the user
+                newFavourite.save(function(err) {
+                    if (err){
+                        console.log('Error in Saving favourite: '+err);
+                        throw err;
+                    }
+                    res.send({favourite: 1});
+                    return (newFavourite);
+                });
+            }
+        });
     });
 
 	return router;

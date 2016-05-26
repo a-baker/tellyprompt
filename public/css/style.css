@@ -1,10 +1,34 @@
 body{
     padding-top: 0;
     padding: 0;
+    background-color: #f7f7f7;
+}
+
+div.body {
+    background-color: #fff;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    min-height: 100px;
+    border: 1px solid #e7e7e7;
+    border-radius: 3px;
 }
 
 h1, h2.commentAuthor {
     color: #22264b;
+}
+
+ul.nav li a span {
+    margin-left: 6px;
+}
+
+.navbar a {
+    color: #272727 !important;
+    text-align: center;
+}
+
+.navbar-default {
+    background-color: #fff;
 }
 
 div#content {
@@ -58,6 +82,23 @@ span.postTime {
     color: #f7f7f7;
 }
 
+.titleContainer .ep-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.titleContainer .desc-col, .titleContainer .fav-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.titleContainer a.favourite {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .messageList {
     padding-bottom: 50px;
 }
@@ -93,8 +134,10 @@ h2.messageAuthor {
 .messageForm {
     position: fixed;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: 100%;
+    max-width: 1500px;
     background-color: rgba(0,0,0,0.1);
     height: 50px;
 }
@@ -142,9 +185,12 @@ li.discussion a {
 
 /*  EPISODE LISTING  */
 
+.search{
+    position: relative;
+}
 .searchForm {
     padding: 10px 0;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -245,6 +291,10 @@ p.ep-desc {
     height: 200px;
 }
 
+.showHeader:hover {
+    cursor: pointer;
+}
+
 .showHeader h1 {
     margin: 0;
     padding: 0;
@@ -276,4 +326,44 @@ p.ep-desc {
 
 .bar {
     background-color: #000;
+}
+
+a.favourite i.fa {
+    font-size: 30px;
+    padding: 20px;
+    color: #fff;
+    transition: transform ease-in-out .3s;
+    transform: rotate(0);
+}
+
+a.favourite i.fa-heart.active {
+    transform: rotate(360deg);
+    color: #e74c3c;
+}
+
+
+@media (min-width: 768px){
+    .navbar-nav>li>a {
+        padding: 22px;
+    }
+
+    a.navbar-brand {
+        padding: 22px;
+    }
+
+    .navbar-default {
+        margin-bottom: 32px;
+    }
+
+    div.body {
+        width: 90%;
+    }
+
+    .messageForm {
+        width: 90%;
+    }
+
+    ul.nav a span {
+        display: none;
+    }
 }

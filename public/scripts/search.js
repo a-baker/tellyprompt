@@ -1,6 +1,3 @@
-var bar = new Nanobar({
-});
-
 var showID = 0;
 
 function scrollDown(amount, time){
@@ -15,9 +12,19 @@ function scrollTop(){
     }, 100);
 }
 
+$(document).ready(function(){
+
+   if (defaultSearch){
+       $('.searchBox').val(defaultSearch);
+       $('.searchForm').submit();
+   }
+
+    //history.replaceState({term: defaultSearch},'', window.location);
+});
+
 function update (e, h){
     if(e) { e.preventDefault(); }
-    var searchTerm = $('.searchBox').val();
+    var searchTerm = $('.searchBox').val().replace(/\//g, '%2F');
     if (searchTerm == "" || searchTerm == null){
         if(h){$('.series').html("")}
         return;
@@ -25,8 +32,8 @@ function update (e, h){
     $('.errBar').removeClass('show');
     bar.go(30);
 
-    if (!h && searchTerm !== window.history.state.term) {
-        window.history.pushState({term: searchTerm}, "", searchTerm);
+    if (!h && searchTerm !== location.pathname.substr(location.pathname.lastIndexOf('/')+1, location.pathname.length).replace(/%2F/g, "/").replace(/%20/g, " ")) {
+        window.history.pushState(null, "", "/search/" + searchTerm);
     }
 
     $.ajax({
@@ -79,6 +86,7 @@ function update (e, h){
 
                                         div.toggle();
                                         $('.errBar').removeClass('show');
+                                        chatredirect();
                                     }
                                 }
                             });
@@ -108,22 +116,9 @@ $('.errBar').click(function(){
     $(this).removeClass('show');
 });
 
-$(document).ready(function(){
-
-   if (defaultSearch){
-       $('.searchBox').val(defaultSearch);
-       $('.searchForm').submit();
-   }
-
-    history.replaceState({term: defaultSearch},'', window.location);
-});
-
 $(window).bind("popstate", function(event) {
-    var state = event.originalEvent.state;
-        if (state != null){
-            if ('term' in state){
-                $('.searchBox').val(state.term);
-                update(null, true);
-            }
-        }
-    });
+    var term = location.pathname.substr(location.pathname.lastIndexOf('/')+1, location.pathname.length);
+    term = decodeURI(term).replace(/%2F/g, "/");;
+    $('.searchBox').val(term);
+    update(null, true);
+});
