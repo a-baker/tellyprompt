@@ -44,7 +44,7 @@ $('.btn_fav').click(function(e){
 function chatredirect() {
     $('.chatLink').click(function(e){
         e.preventDefault();
-
+        $('.navbar-right').children().removeClass('active');
         bar.go(30);
         var link = this.href;
 
