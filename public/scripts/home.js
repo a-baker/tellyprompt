@@ -194,6 +194,10 @@ function updateFromUrl(path){
     }
 }
 
+$('.navbar-right a').on('click', function(){
+    if ($('body').width() < 768) { $('.navbar-toggle').click() }
+});
+
 $(window).bind("popstate", function(event) {
     console.log(window.location.pathname);
     updateFromUrl(window.location.pathname);

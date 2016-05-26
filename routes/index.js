@@ -151,7 +151,7 @@ function getEpisodeInfo(id, callback){
                             if (response.ok) {
                                 var show = response.body;
 
-                                var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": "http://image.tmdb.org/t/p/original" + ep.still_path, "showID": show.id};
+                                var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": ep.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + ep.still_path , "showID": show.id};
 
                                 callback(null, showData);
 

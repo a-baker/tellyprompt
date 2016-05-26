@@ -180,6 +180,7 @@ h2.messageAuthor {
     max-width: 1500px;
     background-color: rgba(0,0,0,0.1);
     height: 50px;
+    z-index: 1000;
 }
 
 .messageForm input[type="text"]{
