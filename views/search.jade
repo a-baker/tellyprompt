@@ -1,19 +1,15 @@
-extends layout
+h1.sectionHead
+    i.fa.fa-search
+    span Search
+div.search
+    form.searchForm
+        input(type="text", placeholder="Search for a show...").searchBox
+        div.errBar
+            span.errText
+div.series
 
-block content
-    div.loadBar
-    div.search
-        form.searchForm
-            input(type="text", placeholder="Search for a show...").searchBox
-            div.errBar
-                span.errText
-    div.series
-        
-    script(type='text/javascript').
-        var defaultSearch ="#{defaultSearch}";
-        
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js")
-    script(type='text/javascript', src="/scripts/nanobar.min.js")
-    script(type='text/javascript', src="/scripts/season.js")
-    script(type='text/javascript', src="/scripts/search.js")
-    
+script(type='text/javascript').
+    var defaultSearch ="#{defaultSearch}";
+
+script(type='text/javascript', src="/scripts/search.js")
+

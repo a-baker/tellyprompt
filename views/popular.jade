@@ -1,3 +1,4 @@
+
 mixin episode(ep)
     a(href="/chat/" + ep.showID + "/" + ep.season + "/" + ep.episode).chatLink
         div.row.ep-row
@@ -9,8 +10,8 @@ mixin episode(ep)
                 
 
 h1.sectionHead
-    i.fa.fa-heart
-    span Favourites
-div.favouritesWrapper
+    i.fa.fa-line-chart
+    span Popular
+div.popularWrapper
     each ep in data.episodes
         +episode(ep)

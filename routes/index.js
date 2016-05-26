@@ -8,6 +8,7 @@ var Episode = require('../models/episode');
 var Show = require('../models/show');
 var User = require('../models/user');
 var Favourite = require('../models/favourite');
+var Favouritenumber = require('../models/favouritenumber');
 var unirest = require('unirest');
 var async = require('async');
 
@@ -170,7 +171,7 @@ function getEpisodeInfo(id, callback){
 function getFavourites(username, callback){
     var favouritesData = {episodes: []};
     Favourite.find( { username: username } ).lean().exec(function (err, favourites) {
-        async.eachSeries(favourites, function(item, cb){
+        async.each(favourites, function(item, cb){
             getEpisodeInfo(item.discussionID, function(err, data){
                 var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
                 favouritesData.episodes.push(ep);
@@ -179,6 +180,25 @@ function getFavourites(username, callback){
         }, function(){
             if(!err){
                 callback(null, favouritesData);
+            } else {
+                callback(err);
+            }
+        });
+    });
+}
+
+function getPopular(callback){
+    var popularData = {episodes: []};
+    Favouritenumber.find().sort({'favourites': -1}).limit(5).exec(function(err, shows) {
+        async.each(shows, function(item, cb){
+            getEpisodeInfo(item.discussionID, function(err, data){
+                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                popularData.episodes.push(ep);
+                cb();
+            });
+        }, function(){
+            if(!err){
+                callback(null, popularData);
             } else {
                 callback(err);
             }
@@ -228,7 +248,7 @@ module.exports = function(passport){
 		res.redirect('/search');
 	});
 
-    router.get('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
+    router.post('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
 
 //        Discussion.findOne( { _id : req.params.chatid } ).lean().exec(function (err, discussions) {
 //
@@ -248,12 +268,18 @@ module.exports = function(passport){
 
         getEpisodeInfo(epID, function(err, data){
             if(!err){
-                res.render('chat', {user: req.user, id: epID, ep: data})
+                if (req.body.ajax) {
+                    res.render('chat', {user: req.user, id: epID, ep: data});
+                }
             } else {
                 res.send(err);
             }
         });
 	});
+
+    router.get('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
+        res.render('index', {username: req.user.username});
+    });
 
     router.get('/episode/:id', function(req, res){
         getEpisodeInfo(req.params.id, function(err, data){
@@ -304,22 +330,54 @@ module.exports = function(passport){
         });
     });
 
-    router.get('/search', function(req, res){
-        res.render('search', {defaultSearch: null});
+    router.get('/search', isAuthenticated, function(req, res){
+        if(req.xhr) {
+            res.render('search', {defaultSearch: null});
+        } else {
+            res.render('index', {username: req.user.username});
+        }
     });
 
-    router.get('/search/:term', function(req, res){
-        res.render('search', {defaultSearch: req.params.term});
+    router.get('/search/:term', isAuthenticated, function(req, res){
+        if(req.xhr) {
+            res.render('search', {defaultSearch: req.params.term});
+        } else {
+            res.render('index', {username: req.user.username});
+        }
     });
 
     router.post('/favourites', function(req, res){
         getFavourites(req.body.username, function(err, info){
            if(!err){
-               res.render('favourites', {data: info});
+               if(req.xhr) {
+                   res.render('favourites', {data: info});
+               } else {
+                    res.render('index');
+                }
            } else {
                res.send(err);
            }
         });
+    });
+
+    router.get('/favourites', isAuthenticated, function(req, res) {
+        res.render('index', {username: req.user.username});
+    });
+
+    router.post('/popular', isAuthenticated, function(req, res) {
+        if(req.xhr && req.body.ajax) {
+            getPopular(function (err, info){
+               if(!err) {
+                   res.render('popular', {data: info});
+               } else {
+                   res.send(err);
+               }
+            });
+        }
+    });
+
+    router.get('/popular', isAuthenticated, function(req, res) {
+            res.render('index', {username: req.user.username});
     });
 
 	/* Handle Logout */
@@ -428,6 +486,10 @@ module.exports = function(passport){
                 Favourite.remove({ 'username' :  username, 'discussionID': discussionID }, function(err, favourite){
                     if (err) return err;
                     res.send({favourite: 0});
+
+                    Favouritenumber.update({discussionID: discussionID}, {$inc: { favourites: -1 }}, {upsert: true, setDefaultsOnInsert: true}, function(err, data){
+                        console.log('fav -1');
+                    });
                 });
             } else {
                 var newFavourite = new Favourite();
@@ -441,6 +503,11 @@ module.exports = function(passport){
                         throw err;
                     }
                     res.send({favourite: 1});
+
+                    Favouritenumber.update({discussionID: discussionID}, {$inc: { favourites: 1 }}, {upsert: true, setDefaultsOnInsert: true}, function(err, data){
+                        console.log('fav +1');
+                    });
+
                     return (newFavourite);
                 });
             }
@@ -449,8 +516,3 @@ module.exports = function(passport){
 
 	return router;
 }
-
-
-
-
-

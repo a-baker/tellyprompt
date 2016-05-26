@@ -1,29 +1,23 @@
-extends layout
+script(type='text/javascript').
+    var chat_id ="#{id}"; var localUser = "#{user.username}";
 
-block content
-
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.16/browser.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js")
-    script(src="https://cdn.socket.io/socket.io-1.2.0.js")
-    
-    script(type='text/javascript').
-        var chat_id ="#{id}"; var localUser = "#{user.username}";
-
-    div.titleContainer
-        div.row.ep-row
-            div.still-col
+div.titleContainer
+    div.row.ep-row
+        div.still-col
+            if ep.still !== "/img/nostill.jpg"
                 img.ep-still(src="#{ep.still}")
-            div.col-sm-10.desc-col
-                p.ep-desc= ep.show + " S" + ep.season + "E" + ep.episode + ": " + ep.title
-            div.col-sm-2.fav-col
-                a.favourite(href="/api/favourites/#{id}")
-                    i.fa.fa-heart
-                
-    
-    div#content
+        div.col-sm-10.desc-col
+            p.ep-desc= ep.show + " S" + ep.season + "E" + ep.episode + ": " + ep.title
+        div.col-sm-2.fav-col
+            a.favourite(href="/api/favourites/#{id}")
+                i.fa.fa-heart
 
-    script(type="text/babel" src="/scripts/chat.js")
+
+div#content
+
+script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js")
+script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js")
+script(src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js")
+script(src="https://cdn.socket.io/socket.io-1.2.0.js")
+script(type="text/babel" src="/scripts/chat.js")
 

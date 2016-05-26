@@ -49,6 +49,7 @@ function update (e, h){
                     for(i = 0; i < length; i++){
                         var data = res.seasons[i];
                         var season = data.season;
+                        var seasonTitle = data.season == 0 ? "Specials & Extras" : "Season " + data.season;
 
                         var img = "http://image.tmdb.org/t/p/original" + data.poster;
 
@@ -115,10 +116,10 @@ $('.searchForm').submit(function(e){
 $('.errBar').click(function(){
     $(this).removeClass('show');
 });
-
-$(window).bind("popstate", function(event) {
-    var term = location.pathname.substr(location.pathname.lastIndexOf('/')+1, location.pathname.length);
-    term = decodeURI(term).replace(/%2F/g, "/");;
-    $('.searchBox').val(term);
-    update(null, true);
-});
+//
+//$(window).bind("popstate", function(event) {
+//    var term = location.pathname.substr(location.pathname.lastIndexOf('/')+1, location.pathname.length);
+//    term = decodeURI(term).replace(/%2F/g, "/");
+//    $('.searchBox').val(term);
+//    update(null, true);
+//});
