@@ -6,9 +6,9 @@ div.titleContainer
         div.still-col
             if ep.still !== "/img/nostill.jpg"
                 img.ep-still(src="#{ep.still}")
-        div.col-sm-10.desc-col
+        div.col-xs-10.desc-col
             p.ep-desc= ep.show + " S" + ep.season + "E" + ep.episode + ": " + ep.title
-        div.col-sm-2.fav-col
+        div.col-xs-2.fav-col
             a.favourite(href="/api/favourites/#{id}")
                 i.fa.fa-heart
 
