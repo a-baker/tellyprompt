@@ -206,6 +206,18 @@ function getPopular(callback){
     });
 }
 
+function isFavourite(username, episode, callback){
+    Favourite.findOne({username: username, discussionID: episode}).exec(function(err, favourites) {
+        if(!err) {
+            if(favourites){
+                 callback(null, '1');
+            } else {
+                callback(null, '0');
+            }
+        } else { callback(err); }
+    });
+}
+
 module.exports = function(passport){
 
 	/* GET login page. */
@@ -250,30 +262,22 @@ module.exports = function(passport){
 
     router.post('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
 
-//        Discussion.findOne( { _id : req.params.chatid } ).lean().exec(function (err, discussions) {
-//
-//            if (err){
-//                console.log('Error: '+err);
-//                throw err;
-//            }
-//
-//            if(discussions !== null){
-//                res.render('chat', { user: req.user, id: req.params.chatid, topic: discussions.topic });
-//            } else {
-//                res.status(404).send("Sorry, that discussion doesn't exist!");
-//            }
-//        });
-
         var epID = req.params.show + "s" + req.params.season + "e" + req.params.ep;
 
-        getEpisodeInfo(epID, function(err, data){
-            if(!err){
-                if (req.body.ajax) {
-                    res.render('chat', {user: req.user, id: epID, ep: data});
-                }
-            } else {
-                res.send(err);
-            }
+        isFavourite(req.user.username, epID, function(err, fav) {
+            if(!err) {
+
+                getEpisodeInfo(epID, function(err, data){
+                    if(!err){
+                        if (req.body.ajax) {
+                            res.render('chat', {user: req.user, id: epID, ep: data, favourite: fav});
+                        }
+                    } else {
+                        res.send(err);
+                    }
+                });
+
+            } else { res.send(err); }
         });
 	});
 
@@ -362,6 +366,12 @@ module.exports = function(passport){
 
     router.get('/favourites', isAuthenticated, function(req, res) {
         res.render('index', {username: req.user.username});
+    });
+
+    router.get('/isfavourite/:u/:e', function(req,res){
+        isFavourite(req.params.u, req.params.e, function(err, data){
+            res.send(data);
+        });
     });
 
     router.post('/popular', isAuthenticated, function(req, res) {
