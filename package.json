@@ -12,6 +12,7 @@
     "express-session": "^1.13.0",
     "jade": "^1.11.0",
     "mongoose": "^4.4.14",
+    "mongoose-paginate": "^5.0.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "shortid": "^2.2.6",

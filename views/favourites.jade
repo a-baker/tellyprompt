@@ -6,7 +6,8 @@ mixin episode(ep)
                         img.ep-still(src="#{ep.still}")
                 div.col-sm-12.desc-col
                     p.ep-desc= ep.show + " S" + ep.season + "E" + ep.episode + ": " + ep.title
-                
+
+- nextPage = Number(data.page) + 1; prevPage = Number(data.page) - 1;
 
 h1.sectionHead
     i.fa.fa-heart
@@ -14,3 +15,14 @@ h1.sectionHead
 div.favouritesWrapper
     each ep in data.episodes
         +episode(ep)
+div.pageButtons
+    div.row
+        div.col-xs-4
+            a.btn.btn-lg.btn-pages.btn-prev(href="/favourites/#{prevPage}") Previous Page
+        div.col-xs-4
+            p.page-num Page: #{data.page}
+        div.col-xs-4
+            a.btn.btn-lg.btn-pages.btn-next(href="/favourites/#{nextPage}") Next Page
+
+script(type="text/javascript").
+    var page = #{data.page}, pages = #{data.pages};

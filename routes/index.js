@@ -168,21 +168,53 @@ function getEpisodeInfo(id, callback){
         });
 }
 
-function getFavourites(username, callback){
-    var favouritesData = {episodes: []};
-    Favourite.find( { username: username } ).lean().exec(function (err, favourites) {
-        async.each(favourites, function(item, cb){
-            getEpisodeInfo(item.discussionID, function(err, data){
-                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                favouritesData.episodes.push(ep);
-                cb();
+function getFavourites(username, page, callback){
+    var favouritesData = {pages: 0, page: 0, episodes: []};
+//    Favourite.find( { username: username } ).lean().exec(function (err, favourites) {
+//        async.each(favourites, function(item, cb){
+//            getEpisodeInfo(item.discussionID, function(err, data){
+//                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+//                favouritesData.episodes.push(ep);
+//                cb();
+//            });
+//        }, function(){
+//            if(!err){
+//                callback(null, favouritesData);
+//            } else {
+//                callback(err);
+//            }
+//        });
+//    });
+
+    Favourite.paginate({username: username}, { page: 1, limit: 5 } , function(err, paginatedResults) {
+
+        if ( page > paginatedResults.pages ) { page = paginatedResults.pages; }
+        if ( page < 1) { page = 1; }
+
+        favouritesData.pages = paginatedResults.pages;
+        favouritesData.page = page;
+
+        Favourite.paginate({username: username}, { page: page, limit: 5 } , function(err, paginatedResults) {
+          if (err) {
+            console.error(err);
+          } else {
+            console.log(paginatedResults);
+
+            async.each(paginatedResults.docs, function(item, cb){
+                getEpisodeInfo(item.discussionID, function(err, data){
+                    var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                    favouritesData.episodes.push(ep);
+                    cb();
+                });
+            }, function(){
+                if(!err){
+                    callback(null, favouritesData);
+                } else {
+                    callback(err);
+                }
             });
-        }, function(){
-            if(!err){
-                callback(null, favouritesData);
-            } else {
-                callback(err);
-            }
+
+          }
         });
     });
 }
@@ -335,23 +367,27 @@ module.exports = function(passport){
     });
 
     router.get('/search', isAuthenticated, function(req, res){
-        if(req.xhr) {
-            res.render('search', {defaultSearch: null});
-        } else {
             res.render('index', {username: req.user.username});
-        }
     });
 
     router.get('/search/:term', isAuthenticated, function(req, res){
-        if(req.xhr) {
-            res.render('search', {defaultSearch: req.params.term});
-        } else {
             res.render('index', {username: req.user.username});
+    });
+
+    router.post('/search', isAuthenticated, function(req, res){
+        if(req.xhr && req.body.ajax) {
+            res.render('search', {defaultSearch: null});
+        }
+    });
+
+    router.post('/search/:term', isAuthenticated, function(req, res){
+        if(req.xhr && req.body.ajax) {
+            res.render('search', {defaultSearch: req.params.term});
         }
     });
 
     router.post('/favourites', function(req, res){
-        getFavourites(req.body.username, function(err, info){
+        getFavourites(req.body.username, 1, function(err, info){
            if(!err){
                if(req.xhr) {
                    res.render('favourites', {data: info});
@@ -364,7 +400,25 @@ module.exports = function(passport){
         });
     });
 
+    router.post('/favourites/:page', function(req, res){
+        getFavourites(req.body.username, req.params.page, function(err, info){
+           if(!err){
+               if(req.xhr) {
+                   res.render('favourites', {data: info});
+               } else {
+                   res.render('index');
+               }
+           } else {
+               res.send(err);
+           }
+        });
+    });
+
     router.get('/favourites', isAuthenticated, function(req, res) {
+        res.render('index', {username: req.user.username});
+    });
+
+    router.get('/favourites/:page', isAuthenticated, function(req, res) {
         res.render('index', {username: req.user.username});
     });
 

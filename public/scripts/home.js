@@ -8,7 +8,7 @@ $('.btn_search').click(function(e){
 
 $('.btn_fav').click(function(e){
     e.preventDefault();
-    favouritesPage();
+    favouritesPage(1);
 });
 
 $('.btn_popular').click(function(e){
@@ -24,7 +24,8 @@ var searchPage = function(){
 
     $.ajax({
         url: "/search",
-        type: 'GET',
+        type: 'POST',
+        data: {ajax: 1},
         success: function(res){
 
             if(!window.location.pathname.split('/')[1] || window.location.pathname.split('/')[1] !== "search" || window.location.pathname.split('/')[2]) {
@@ -38,26 +39,55 @@ var searchPage = function(){
     });
 }
 
-var favouritesPage = function() {
+var favouritesPage = function(pagenum) {
     bar.go(30);
 
     $('.navbar-right').children().removeClass('active');
     $('.btn_fav').parent().addClass('active');
 
     $.ajax({
-        url: "/favourites",
+        url: "/favourites/" + pagenum,
         type: 'POST',
         data: {username: localUser},
         success: function(res){
-            if(!window.location.pathname.split('/')[1] || window.location.pathname.split('/')[1] !== "favourites" || window.location.pathname.split('/')[2]) {
-                window.history.pushState(null, "", "/favourites");
+            if(window.location.pathname !== "/favourites/" + pagenum) {
+                window.history.pushState(null, "", "/favourites/" + pagenum);
             }
             $('.body').html("");
             $('.body').append(res);
             bar.go(100);
             chatredirect()
+            updateFavPageButtons(page);
+
+            if(pagenum !== page) {
+                window.history.replaceState(null, "", "/favourites/" + page);
+            }
         }
     });
+}
+
+var updateFavPageButtons = function(page){
+    $('.btn-next').removeClass('inactive');
+    $('.btn-prev').removeClass('inactive');
+
+    if (page >= pages) { $('.btn-next').addClass('inactive'); }
+    if (page == 1) { $('.btn-prev').addClass('inactive'); }
+
+    nextPage = page + 1;
+    prevPage = page - 1;
+
+
+    $('.btn-next').click(function(e){
+        e.preventDefault();
+        favouritesPage(nextPage);
+    });
+
+    $('.btn-prev').click(function(e){
+        e.preventDefault();
+        favouritesPage(prevPage);
+    });
+
+
 }
 
 var popularPage = function() {
@@ -90,7 +120,8 @@ var performSearch = function(searchterm) {
 
     $.ajax({
         url: "/search",
-        type: 'GET',
+        type: 'POST',
+        data: {ajax: 1},
         success: function(res){
 
             $('.body').html("");
@@ -179,7 +210,12 @@ function updateFromUrl(path){
             }
             break;
         case "favourites":
-            favouritesPage();
+            if(section[2] && !isNaN(section[2])){
+                favouritesPage(Number(section[2]));
+            } else {
+                favouritesPage(1);
+            }
+
             break;
         case "popular":
             popularPage();
@@ -199,7 +235,6 @@ $('.navbar-right a').on('click', function(){
 });
 
 $(window).bind("popstate", function(event) {
-    console.log(window.location.pathname);
     updateFromUrl(window.location.pathname);
 });
 

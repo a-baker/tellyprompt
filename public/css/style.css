@@ -4,6 +4,10 @@ body{
     background-color: #f7f7f7;
 }
 
+h1 {
+    border: none;
+}
+
 div.body {
     background-color: #fff;
     width: 100%;
@@ -390,6 +394,52 @@ a.favourite i.fa-heart.active {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
     color: #e74c3c;
+}
+
+.btn-pages.inactive {
+    pointer-events: none;
+    cursor: default;
+}
+
+
+/* LOGIN PAGE */
+
+.loginContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+    width: 85%;
+    max-width: 750px;
+}
+
+.login-title {
+    color: #272727;
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.form-signin input {
+    height: 50px;
+    margin: 3px 0;
+    color: #272727;
+    font-size: 20px;
+}
+
+.loginContent .btn {
+    margin-top: 2px;
+}
+
+.btn-primary {
+    background-color: #2ECC71;
+    border-color: #2eb366;
+    outline: none !important;
+}
+
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+    background-color: #2eb366;
+    border-color: #258C50;
 }
 
 
