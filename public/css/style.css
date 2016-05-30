@@ -399,8 +399,37 @@ a.favourite i.fa-heart.active {
 .btn-pages.inactive {
     pointer-events: none;
     cursor: default;
+    border: solid 1px #ccc;
 }
 
+.btn-pages.inactive i.fa {
+    color: #ccc;
+}
+
+.btn-pages i.fa {
+    color: #505050;
+    font-size: 25px;
+}
+
+p.page-num {
+    font-size: 20px;
+    margin-top: 14px;
+    color: #505050;
+}
+
+.btn-pages {
+    padding: 15px 30px;
+    border: solid 1px #505050;
+}
+
+.pageButtons {
+    margin-top: 5px;
+    text-align: center;
+}
+
+.btn-pages:hover {
+    background-color: #F7f7f7;
+}
 
 /* LOGIN PAGE */
 
