@@ -193,6 +193,10 @@ h2.messageAuthor {
     padding: 0 5px;
     box-sizing: border-box;
     outline: none;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    -webkit-appearance: none;
+    border: 1px solid #ccc;
 }
 
 .messageForm input[type="submit"]{
@@ -205,6 +209,9 @@ h2.messageAuthor {
     border: none;
     border-left: #2eb366 2px solid;
     font-size: 18px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    -webkit-appearance: none;
 }
 
 /*  DISCUSSIONS PAGE  */
@@ -496,4 +503,12 @@ p.page-num {
     ul.nav a span {
         display: none;
     }
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select,
+  textarea,
+  input {
+    font-size: 16px;
+  }
 }

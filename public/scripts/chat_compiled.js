@@ -2,6 +2,10 @@
 
 var socket = io();
 
+$(window).on('beforeunload', function(){
+    socket.close();
+});
+
 var username = localUser;
 var chat_url = "/api/messages/discussion/" + chat_id;
 
