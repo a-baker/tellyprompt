@@ -152,8 +152,6 @@ var performSearch = function(searchterm) {
             bar.go(100);
         }
     });
-
-    console.log('This, on the other hand, should not.');
 }
 
 function chatredirect() {
@@ -174,7 +172,6 @@ function chatredirect() {
                 $('.welcome').hide();
                 $.getScript("/scripts/chat_compiled.js")
                 bar.go(100);
-                console.log(link.href);
                 window.history.pushState(null, "", link);
                 favClick();
             }
