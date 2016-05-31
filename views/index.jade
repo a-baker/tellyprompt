@@ -1,5 +1,15 @@
 extends layout
 
+mixin episode(ep)
+    a(href="/chat/" + ep.showID + "/" + ep.season + "/" + ep.episode).chatLink
+        div.row.ep-row
+                div.still-col
+                    if ep.still !== "/img/nostill.jpg"
+                        img.ep-still(src="#{ep.still}")
+                div.col-sm-12.desc-col
+                    p.ep-desc= ep.show + " S" + ep.season + "E" + ep.episode + ": " + ep.title
+                    
+
 block content
     include header.jade
     
@@ -7,9 +17,40 @@ block content
         var localUser = "#{username}";
     
     div.body
+    div.welcome
+        h1.hello 
+            span.name Hello, #{username}.
+            br
+            span.question Watched anything good recently?
+        
+        div.search
+            form.welcomeSearchForm
+                input(type="text", placeholder="Search for a show...").searchBox
+                div.errBar
+                    span.errText
+    
+    div.welcome
+        - if (epFav && !epFav.favourites) {epFav.favourites = "0" }
+        
+        div.stats
+            h2.statTitle Here's the lowdown
+            if epFav
+                h3.statText
+                    span You and #{epFav.favourites} others gave some
+                    i.fa.fa-heart
+                    span to
+                +episode(epFav)
+                
+            if epPop && epPop.showID
+                h3.statText
+                    span The most
+                    i.fa.fa-heart.partOfWord
+                    span ed episode is
+                +episode(epPop)
     
     script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js")
     script(src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js")
     script(src="https://cdn.socket.io/socket.io-1.2.0.js")
     script(type='text/javascript', src="/scripts/nanobar.min.js")
+    script(type='text/javascript', src="/scripts/search.js")
     script(src="/scripts/home.js")

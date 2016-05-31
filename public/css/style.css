@@ -8,15 +8,75 @@ h1 {
     border: none;
 }
 
-div.body {
+div.body, div.welcome {
     background-color: #fff;
     width: 100%;
     max-width: 1500px;
-    margin: 0 auto;
     min-height: 100px;
     border: 1px solid #e7e7e7;
     border-radius: 3px;
     padding-bottom: 20px;
+}
+
+.body {
+    display: none;
+    margin: 0 auto;
+}
+
+.welcome {
+    text-align: center;
+    margin: 0 auto 20px auto;
+}
+
+.welcome .search {
+    margin-bottom: 30px;
+}
+
+.welcome .ep-row {
+    margin-bottom: 40px;
+}
+
+.stats {
+   margin-top: 35px;
+}
+
+.statText i.fa.fa-heart {
+    color: #e74c3c;
+    margin: 0 10px;
+}
+
+i.fa.fa-heart.partOfWord {
+    margin-right: 0;
+}
+
+h2.statTitle {
+    color: #272727;
+    font-weight: 600;
+    font-size: 28px;
+    border: none;
+    margin-bottom: 30px;
+}
+
+h3.statText {
+    border: none;
+    font-size: 24px;
+    font-weight: 300;
+    color: #505050;
+    margin-bottom: 10px;
+}
+
+h1.hello {
+    color: #272727;
+    font-weight: 600;
+    margin-bottom: 30px;
+    margin-top: 40px;
+}
+
+h1.hello span.question {
+    margin-top: 5px;
+    font-size: 30px;
+    display: block;
+    font-weight: 400;
 }
 
 .sectionHead {
@@ -492,7 +552,7 @@ p.page-num {
         margin-bottom: 32px;
     }
 
-    div.body {
+    div.body, div.welcome {
         width: 90%;
     }
 

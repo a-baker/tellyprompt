@@ -219,6 +219,34 @@ function getFavourites(username, page, callback){
     });
 }
 
+function getOneFavourite(username, callback){
+    Favourite.find({username: username}).exec(function(err, favourites) {
+        var length = favourites.length;
+
+        var i = Math.floor(Math.random() * favourites.length);
+
+        if(!err && favourites[i]){
+            getEpisodeInfo(favourites[i].discussionID, function(err, data){
+                if(!err){
+                    Favouritenumber.findOne({discussionID: favourites[i].discussionID}).exec(function(err, favinfo) {
+                        if(!err){
+                            data.favourites = favinfo.favourites - 1;
+                            console.log(data.favourites);
+                            callback(null, data);
+                        } else {
+                            callback(err);
+                        }
+                    });
+                } else {
+                    callback(err);
+                }
+            })
+        } else {
+            callback(err);
+        }
+    });
+}
+
 function getPopular(callback){
     var popularData = {episodes: []};
     Favouritenumber.find().sort({'favourites': -1}).limit(5).exec(function(err, shows) {
@@ -231,6 +259,25 @@ function getPopular(callback){
         }, function(){
             if(!err){
                 callback(null, popularData);
+            } else {
+                callback(err);
+            }
+        });
+    });
+}
+
+function mostPopular(callback){
+    var epData = {};
+    Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, shows) {
+        async.each(shows, function(item, cb){
+            getEpisodeInfo(item.discussionID, function(err, data){
+                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                epData = ep;
+                cb();
+            });
+        }, function(){
+            if(!err){
+                callback(null, epData);
             } else {
                 callback(err);
             }
@@ -278,7 +325,19 @@ module.exports = function(passport){
 	}));
 
     router.get('/', isAuthenticated, function(req, res){
-        res.render('index', {username: req.user.username});
+        mostPopular(function (err, popInfo){
+            if(!err){
+                getOneFavourite(req.user.username, function(err, favInfo){
+                    if(!err) {
+                       res.render('index', {username: req.user.username, epFav: favInfo, epPop: popInfo});
+                    } else {
+                       res.send(err);
+                    }
+                });
+            } else {
+                res.send(err);
+            }
+        });
     });
 
     router.get('/discussions', isAuthenticated, function(req, res){

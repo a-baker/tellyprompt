@@ -1,19 +1,29 @@
 var bar = new Nanobar({
 });
 
+var defaultSearch = "";
+
+function toBody() {
+    $('.welcome').hide();
+    $('.body').show();
+}
+
 $('.btn_search').click(function(e){
     e.preventDefault();
     searchPage();
+    toBody();
 });
 
 $('.btn_fav').click(function(e){
     e.preventDefault();
     favouritesPage(1);
+    toBody();
 });
 
 $('.btn_popular').click(function(e){
     e.preventDefault();
     popularPage();
+    toBody();
 });
 
 var searchPage = function(){
@@ -27,6 +37,8 @@ var searchPage = function(){
         type: 'POST',
         data: {ajax: 1},
         success: function(res){
+
+            $.getScript("/scripts/search.js");
 
             if(!window.location.pathname.split('/')[1] || window.location.pathname.split('/')[1] !== "search" || window.location.pathname.split('/')[2]) {
                 window.history.pushState(null, "", "/search");
@@ -112,6 +124,11 @@ var popularPage = function() {
     });
 }
 
+$('.welcomeSearchForm').submit(function(e){
+    e.preventDefault();
+    performSearch($('.searchBox').val());
+});
+
 var performSearch = function(searchterm) {
     bar.go(30);
 
@@ -123,6 +140,10 @@ var performSearch = function(searchterm) {
         type: 'POST',
         data: {ajax: 1},
         success: function(res){
+
+            toBody();
+
+            $.getScript("/scripts/search.js");
 
             $('.body').html("");
             $('.body').append(res);
@@ -149,6 +170,8 @@ function chatredirect() {
             success: function(res){
                 $('.body').html("");
                 $('.body').append(res);
+                $('.body').show();
+                $('.welcome').hide();
                 $.getScript("/scripts/chat_compiled.js")
                 bar.go(100);
                 console.log(link.href);
@@ -202,14 +225,15 @@ function updateFromUrl(path){
 
     switch(section[1]) {
         case "search":
+            toBody();
             if(window.location.pathname == '/search'){
                searchPage();
-                console.log('yay?');
             } else {
                 performSearch(decodeURI(section[2]).replace(/%2F/g, "/"));
             }
             break;
         case "favourites":
+            toBody();
             if(section[2] && !isNaN(section[2])){
                 favouritesPage(Number(section[2]));
             } else {
@@ -218,14 +242,19 @@ function updateFromUrl(path){
 
             break;
         case "popular":
+            toBody();
             popularPage();
             break;
         case "chat":
-            if(section[2] && section[3] && section[4]);
-            getChat(window.location.pathname);
+            toBody();
+            if(section[2] && section[3] && section[4]){
+                getChat(window.location.pathname);
+            }
             break;
         default:
+            $('.welcome').show();
             $('.body').html('');
+            $('.body').hide();
             break;
     }
 }
@@ -240,4 +269,5 @@ $(window).bind("popstate", function(event) {
 
 $(document).ready(function(){
     updateFromUrl(window.location.pathname);
+    chatredirect();
 });
