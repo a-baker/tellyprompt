@@ -23,6 +23,11 @@ div.body, div.welcome {
     margin: 0 auto;
 }
 
+.body.info {
+    display: block;
+    padding: 30px;
+}
+
 .welcome {
     text-align: center;
     margin: 0 auto 20px auto;
@@ -51,7 +56,7 @@ i.fa.fa-heart.partOfWord {
 
 h2.statTitle {
     color: #272727;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 28px;
     border: none;
     margin-bottom: 30px;
@@ -547,6 +552,24 @@ p.noFavs {
 .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
     background-color: #2eb366;
     border-color: #258C50;
+}
+
+/* INFO PAGE */
+
+img.tmdb {
+    height: 26px;
+}
+
+.info h1 {
+    color: #272727;
+}
+
+.info p {
+    font-size: 16px;
+}
+
+.info p:first-of-type {
+    margin-bottom: 30px;
 }
 
 

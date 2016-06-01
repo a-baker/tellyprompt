@@ -351,6 +351,10 @@ module.exports = function(passport){
 		res.redirect('/search');
 	});
 
+    router.get('/info', function(req, res){
+		res.render('info');
+	});
+
     router.post('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
 
         var epID = req.params.show + "s" + req.params.season + "e" + req.params.ep;

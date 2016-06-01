@@ -1,0 +1,12 @@
+extends layout
+
+block content
+    include header.jade
+    div.body.info
+        h1 Info
+        p Tellyprompt is a television discussion platform built with <i class="fa fa-heart"></i> by Aaron Baker as a final-year university project.
+        p 
+            span All television show data is sourced from 
+            a(href="https://www.themoviedb.org")
+                img(src="/img/tmdb-logo.svg", alt="themoviedb.org").tmdb
+        p This product uses the TMDb API but is not endorsed or certified by TMDb.
