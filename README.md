@@ -1,5 +1,7 @@
 # Tellyprompt
 
+The site can be found at http://tellyprompt.com
+
 Tellyprompt is a television discussion platform which connects to a database of television shows and allows users to engage in real-time text chat with others about specific episodes of their favourite shows. The site is fully responsive and mobile-oriented.
 
 The site is built using:
@@ -20,7 +22,7 @@ After signing in, the homepage offers a search bar along with some stats about a
 
 ### Search functionality
 
-Typing a show name into the search bar and hitting enter, either on the homepage or the dedicated search page, will bring back the resulting television show with the closest matching title. All seasons will be displayed of this show, and clicking on each of the season headers will load episode listings for that season. Clicking again will hide the season. This data is fetched through a series of calls to the themoviedb.org API.
+Typing a show name into the search bar and hitting enter, either on the homepage or the dedicated search page, will bring back the resulting television show with the closest matching title. All seasons will be displayed of this show, and clicking on each of the season headers will load episode listings for that season. Clicking again will hide the season. This data is fetched through a series of calls to the themoviedb.org API. Season posters and episode screenshots provided through this API are used as the background of season and episode links, unless none are available in which case a default grey background colour is used.
 
 Clicking on any individual episode will take the user to a chat page for that episode.
 
