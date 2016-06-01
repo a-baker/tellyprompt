@@ -3,12 +3,12 @@
 Tellyprompt is a television discussion platform which connects to a database of television shows and allows users to engage in real-time text chat with others about specific episodes of their favourite shows. The site is fully responsive and mobile-oriented.
 
 The site is built using:
-* *NodeJS* - for the backend/server technology
-* *Express* - a common Node webapp framework
-* *Socket.IO* - for realtime client/server communications when sending chat messages
-* *React* - for live updating the chat display and UI with new messages
-* *mongoDB* - for storing messages, users, and favourites data
-* *jQuery* - for general client-side functionality and scripting
+* **NodeJS** - for the backend/server technology
+* **Express** - a common Node webapp framework
+* **Socket.IO** - for realtime client/server communications when sending chat messages
+* **React** - for live updating the chat display and UI with new messages
+* **mongoDB** - for storing messages, users, and favourites data
+* **jQuery** - for general client-side functionality and scripting
 
 ## The homepage
 
