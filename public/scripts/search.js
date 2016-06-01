@@ -49,11 +49,11 @@ function update (e, h){
                     for(i = 0; i < length; i++){
                         var data = res.seasons[i];
                         var season = data.season;
-                        var seasonTitle = data.season == 0 ? "Specials & Extras" : "Season " + data.season;
+                        var seasonTitle = data.season == 0 ? "Extras (Season 0)" : "Season " + data.season;
 
                         var img = "http://image.tmdb.org/t/p/original" + data.poster;
 
-                        $('.series').append("<div class='showHeader'><div class='seasonImg' style='background-image: url(" + img +") '></div><h1>Season " + season + "</h1></div><div class='seasonWrapper'></div>");
+                        $('.series').append("<div class='showHeader'><div class='seasonImg' style='background-image: url(" + img +") '></div><h1>" + seasonTitle + "</h1></div><div class='seasonWrapper'></div>");
                     }
 
                     scrollTop()
@@ -66,7 +66,7 @@ function update (e, h){
 
                         if (!thisseason.data("loaded")) {
                             bar.go(30);
-                            var season = $(this).find("h1").text().split(' ').pop();
+                            var season = $(this).find("h1").text().split(' ').pop().split(')')[0];
                             $.ajax({
                                 url: "/season/" + showID + "/" + season,
                                 type: 'GET',

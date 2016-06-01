@@ -12,19 +12,25 @@ mixin episode(ep)
 h1.sectionHead
     i.fa.fa-heart
     span Favourites
-div.favouritesWrapper
-    each ep in data.episodes
-        +episode(ep)
-div.pageButtons
-    div.row
-        div.col-xs-4
-            a.btn.btn-lg.btn-pages.btn-prev(href="/favourites/#{prevPage}")
-                i.fa.fa-chevron-left
-        div.col-xs-4
-            p.page-num Page: #{data.page}
-        div.col-xs-4
-            a.btn.btn-lg.btn-pages.btn-next(href="/favourites/#{nextPage}")
-                i.fa.fa-chevron-right
+if data.episodes.length > 0
+    div.favouritesWrapper
+        each ep in data.episodes
+            +episode(ep)
+    div.pageButtons
+        div.row
+            div.col-xs-4
+                a.btn.btn-lg.btn-pages.btn-prev(href="/favourites/#{prevPage}")
+                    i.fa.fa-chevron-left
+            div.col-xs-4
+                p.page-num Page: #{data.page}
+            div.col-xs-4
+                a.btn.btn-lg.btn-pages.btn-next(href="/favourites/#{nextPage}")
+                    i.fa.fa-chevron-right
+
+else
+    p.noFavs.
+        It appears you haven't favourited anything yet. Click the heart button at the top of any episode's chat page to add it as a favourite.
+    
 
 script(type="text/javascript").
     var page = #{data.page}, pages = #{data.pages};

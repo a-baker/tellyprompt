@@ -119,6 +119,7 @@ ul.nav li a span {
 
 .navbar-default {
     background-color: #fff;
+    z-index: 1;
 }
 
 div#content {
@@ -497,6 +498,15 @@ p.page-num {
 
 .btn-pages:hover {
     background-color: #F7f7f7;
+}
+
+p.noFavs {
+    font-size: 20px;
+    font-weight: 300;
+    margin: 0 auto;
+    padding: 10px 20px;
+    color: #505050;
+    text-align: center;
 }
 
 /* LOGIN PAGE */
