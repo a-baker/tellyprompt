@@ -302,7 +302,7 @@ module.exports = function(passport){
 	/* GET login page. */
 	router.get('/login', function(req, res) {
     	// Display the Login page with any flash message, if any
-		res.render('login', { message: req.flash('message') });
+		res.render('login', { message: req.flash('message'), title: "Log In - Tellyprompt" });
 	});
 
 	/* Handle Login POST */
@@ -314,7 +314,7 @@ module.exports = function(passport){
 
 	/* GET Registration Page */
 	router.get('/signup', function(req, res){
-		res.render('register',{message: req.flash('message')});
+		res.render('register',{message: req.flash('message'), title: "Sign Up - Tellyprompt"});
 	});
 
 	/* Handle Registration POST */
@@ -352,7 +352,7 @@ module.exports = function(passport){
 	});
 
     router.get('/info', function(req, res){
-		res.render('info');
+		res.render('info', {title: "Info - Tellyprompt"});
 	});
 
     router.post('/chat/:show/:season/:ep', isAuthenticated, function(req, res){

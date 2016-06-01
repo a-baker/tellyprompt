@@ -47,6 +47,7 @@ var searchPage = function(){
             $('.body').html("");
             $('.body').append(res);
             bar.go(100);
+            document.title = "Search - Tellyprompt";
         }
     });
 }
@@ -62,12 +63,17 @@ var favouritesPage = function(pagenum) {
         type: 'POST',
         data: {username: localUser},
         success: function(res){
+            if(window.location.pathname == "/favourites") {
+                window.history.replaceState(null, "", "/favourites/" + pagenum);
+            }
+
             if(window.location.pathname !== "/favourites/" + pagenum) {
                 window.history.pushState(null, "", "/favourites/" + pagenum);
             }
             $('.body').html("");
             $('.body').append(res);
             bar.go(100);
+            document.title = "Favourites - Tellyprompt";
             chatredirect()
             updateFavPageButtons(page);
 
@@ -119,6 +125,7 @@ var popularPage = function() {
             $('.body').html("");
             $('.body').append(res);
             bar.go(100);
+            document.title = "Popular - Tellyprompt";
             chatredirect()
         }
     });
@@ -147,6 +154,7 @@ var performSearch = function(searchterm) {
 
             $('.body').html("");
             $('.body').append(res);
+            document.title = "Search - Tellyprompt";
             $('.searchBox').val(searchterm);
             $('.searchForm').submit();
             bar.go(100);
@@ -172,6 +180,7 @@ function chatredirect() {
                 $('.welcome').hide();
                 $.getScript("/scripts/chat_compiled.js")
                 bar.go(100);
+                document.title = "Chat - Tellyprompt";
                 window.history.pushState(null, "", link);
                 favClick();
             }
@@ -189,6 +198,7 @@ function getChat(link) {
             success: function(res){
                 $('.body').html("");
                 $('.body').append(res);
+                document.title = "Chat - Tellyprompt";
                 $.getScript("/scripts/chat_compiled.js")
                 bar.go(100);
                 favClick();
@@ -252,6 +262,7 @@ function updateFromUrl(path){
             $('.welcome').show();
             $('.body').html('');
             $('.body').hide();
+            document.title = "Tellyprompt";
             break;
     }
 }
