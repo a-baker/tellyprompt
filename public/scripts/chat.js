@@ -12,6 +12,7 @@ function formatISOString(x){
     var days = date.getDate();
     days = (days < 10) ? ("0" + days) : days;
     var months = date.getMonth();
+    months +=1;
     months = (months < 10) ? ("0" + months) : months;
     var hours = date.getHours();
     hours = (hours < 10) ? ("0" + hours) : hours;
