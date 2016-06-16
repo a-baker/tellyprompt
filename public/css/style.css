@@ -184,7 +184,7 @@ span.postTime {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
 }
 
 .titleContainer .desc-col, .titleContainer .fav-col {
