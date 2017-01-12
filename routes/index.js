@@ -3,7 +3,6 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var Message = require('../models/message');
-var Discussion = require('../models/discussion');
 var Episode = require('../models/episode');
 var Show = require('../models/show');
 var User = require('../models/user');
@@ -340,12 +339,6 @@ module.exports = function(passport){
         });
     });
 
-    router.get('/discussions', isAuthenticated, function(req, res){
-        Discussion.find( {  } ).lean().exec(function (err, discussions) {
-            res.render('discussions', {discussions: discussions});
-        });
-    });
-
 	/* GET Home Page */
 	router.get('/chat', isAuthenticated, function(req, res){
 		res.redirect('/search');
@@ -528,38 +521,6 @@ module.exports = function(passport){
     router.get('/api/users/username/:name', function(req, res){
         User.findOne( { username : req.params.name }, {password: 0, _id: 0, __v: 0} ).lean().exec(function (err, users) {
             return res.end(JSON.stringify(users));
-        });
-    });
-
-    router.get('/api/discussions/username/:name', function(req, res){
-        Discussion.find( { username : req.params.name } ).lean().exec(function (err, discussions) {
-            console.log("discussions: ", discussions);
-            return res.end(JSON.stringify(discussions));
-        });
-    });
-
-    router.get('/api/discussions/episode/:episode', function(req, res){
-        Discussion.find( { episodeID : req.params.episode } ).lean().exec(function (err, discussions) {
-            return res.end(JSON.stringify(discussions));
-        });
-    });
-
-    router.get('/api/discussions/add/:topic/:user/:episode/', function(req, res){
-        var now = new Date()
-        var discussion = new Discussion();
-        discussion.username = req.params.user;
-        discussion.topic = req.params.topic;
-        discussion.episodeID = req.params.episode;
-        discussion.dateTime = now.toISOString();
-
-        // save the discussion
-        discussion.save(function(err) {
-            if (err){
-                console.log('Error in Saving discussion: '+err);
-                throw err;
-            }
-            console.log('discussion saving succesful');
-            return res.end("Saved!");
         });
     });
 
