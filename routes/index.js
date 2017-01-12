@@ -3,7 +3,6 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var Message = require('../models/message');
-var Show = require('../models/show');
 var User = require('../models/user');
 var Favourite = require('../models/favourite');
 var Favouritenumber = require('../models/favouritenumber');
