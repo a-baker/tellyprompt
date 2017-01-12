@@ -8,10 +8,6 @@ var io = require('socket.io')(http);
 var shortid = require('shortid');
 
 
-//path to comments file - temporary, to be replaced by database
-
-
-
 //database config
 var dbConfig = require('./db.js');
 var mongoose = require('mongoose');
