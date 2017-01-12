@@ -8,13 +8,13 @@ var Show = require('../models/show');
 var User = require('../models/user');
 var Favourite = require('../models/favourite');
 var Favouritenumber = require('../models/favouritenumber');
-var unirest = require('unirest');
 var async = require('async');
 
-var ObjectId = require('mongoose').Types.ObjectId;
+var favourites = require('../controllers/favourites');
+var shows = require('../controllers/shows');
+var popular = require('../controllers/popular');
 
-//themoviedb api key
-var APIKEY = "ad3cf5b87d8ad52d68ce61f54f36087f";
+var ObjectId = require('mongoose').Types.ObjectId;
 
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler
@@ -29,271 +29,6 @@ var isAuthenticated = function (req, res, next) {
 var handleOnlyXhr = function(req, res, next) {
   if (req.xhr) return next();
   res.redirect('/');
-}
-
-function getShowInfo(search, callback){
-
-    var obj = {"title": "", id: 0, poster:"", "seasons": []};
-
-    unirest.get("https://api.themoviedb.org/3/search/tv?query=" + search + "&api_key=" + APIKEY)
-                    .send()
-                    .end(response=> {
-                        if (response.ok) {
-                            var data = response.body;
-                            if(data.total_results > 0){
-                                var id = data.results[0].id;
-                                obj.id = id;
-                                unirest.get("https://api.themoviedb.org/3/tv/" + id + "?api_key=" + APIKEY)
-                                    .send()
-                                    .end(response=> {
-                                        if (response.ok) {
-                                            var data = response.body;
-                                            obj.title = data.name;
-                                            obj.poster = data.poster_path;
-                                            var seasons = data.seasons;
-                                            seasons.forEach(function(item,index){
-                                                obj.seasons.push({"season": item.season_number, "episodes": item.episode_count, "poster": item.poster_path});
-                                            });
-
-                                            callback(null, obj);
-
-                                        } else {
-                                            console.log("Error getting show: ", response.error);
-                                            callback("Sorry, there was a problem loading that show.");
-                                        }
-                                    });
-                            } else {
-                                callback("No shows found with the name " + search + ".");
-                                return;
-                            }
-                        } else {
-                            console.log("Error in search: ", response.error);
-                            callback("Sorry, there was a problem loading that show.")
-                        }
-                    });
-}
-
-function getSeasonInfo(series, season, callback){
-    //GET SEASON
-         unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "?api_key=" + APIKEY)
-            .send()
-            .end(response=> {
-                if (response.ok) {
-                    var showseason = response.body;
-
-                        //GET SHOW
-                        unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + APIKEY)
-                            .send()
-                            .end(response=> {
-                                if (response.ok) {
-                                    var show = response.body;
-
-                                    var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path, "showID" : show.id};
-
-                                    showseason.episodes.forEach(function(item, index){
-                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + item.still_path });
-                                    });
-
-                                    callback(null, seasonData);
-
-                                } else {
-                                    console.log("Got an error: ", response.error);
-                                    callback("Sorry, there was a problem loading that season.");
-                                }
-                            });
-                } else {
-                    console.log("Got an error: ", response.error);
-                    callback("Sorry, there was a problem loading that season.");
-                }
-            });
-}
-
-function getSeasons(series, callback){
-    var seriesData = {"title": series.title, "id": series.id, seasons: []};
-    async.eachSeries(series.seasons, function(item, cb){
-        getSeasonInfo(series.id, item.season, function(err, data){
-            var season = {"season": data.season, "episodes": data.episodes};
-            seriesData.seasons.push(season);
-            cb();
-        });
-    }, function(){
-        if(!err){
-            callback(seriesData);
-        } else {
-            callback(err);
-        }
-
-    });
-}
-
-function getEpisodeInfo(id, callback){
-    var epstring = id;
-
-    var s = epstring.indexOf("s");
-    var e = epstring.indexOf("e");
-
-    var series = epstring.substring(0,s);
-    var season = epstring.substring(s+1, e);
-    var episode = epstring.substring(e+1, epstring.length);
-
-     //GET EPISODE
-     unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "/episode/" + episode + "?api_key=" + APIKEY)
-        .send()
-        .end(response=> {
-            if (response.ok) {
-                var ep = response.body;
-
-                    //GET SHOW
-                    unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + APIKEY)
-                        .send()
-                        .end(response=> {
-                            if (response.ok) {
-                                var show = response.body;
-
-                                var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": ep.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + ep.still_path , "showID": show.id};
-
-                                callback(null, showData);
-
-
-                            } else {
-                                console.log("Got an error: ", response.error);
-                                callback("Sorry, there was a problem loading that episode.");
-                            }
-                        });
-            } else {
-                console.log("Got an error: ", response.error);
-                callback("Sorry, there was a problem loading that episode.");
-            }
-        });
-}
-
-function getFavourites(username, page, callback){
-    var favouritesData = {pages: 0, page: 0, episodes: []};
-//    Favourite.find( { username: username } ).lean().exec(function (err, favourites) {
-//        async.each(favourites, function(item, cb){
-//            getEpisodeInfo(item.discussionID, function(err, data){
-//                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-//                favouritesData.episodes.push(ep);
-//                cb();
-//            });
-//        }, function(){
-//            if(!err){
-//                callback(null, favouritesData);
-//            } else {
-//                callback(err);
-//            }
-//        });
-//    });
-
-    Favourite.paginate({username: username}, { page: 1, limit: 5 } , function(err, paginatedResults) {
-
-        if ( page > paginatedResults.pages ) { page = paginatedResults.pages; }
-        if ( page < 1) { page = 1; }
-
-        favouritesData.pages = paginatedResults.pages;
-        favouritesData.page = page;
-
-        Favourite.paginate({username: username}, { page: page, limit: 5 } , function(err, paginatedResults) {
-          if (err) {
-            console.error(err);
-          } else {
-            console.log(paginatedResults);
-
-            async.each(paginatedResults.docs, function(item, cb){
-                getEpisodeInfo(item.discussionID, function(err, data){
-                    var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                    favouritesData.episodes.push(ep);
-                    cb();
-                });
-            }, function(){
-                if(!err){
-                    callback(null, favouritesData);
-                } else {
-                    callback(err);
-                }
-            });
-
-          }
-        });
-    });
-}
-
-function getOneFavourite(username, callback){
-    Favourite.find({username: username}).exec(function(err, favourites) {
-        var length = favourites.length;
-
-        var i = Math.floor(Math.random() * favourites.length);
-
-        if(!err && favourites[i]){
-            getEpisodeInfo(favourites[i].discussionID, function(err, data){
-                if(!err){
-                    Favouritenumber.findOne({discussionID: favourites[i].discussionID}).exec(function(err, favinfo) {
-                        if(!err){
-                            data.favourites = favinfo.favourites - 1;
-                            console.log(data.favourites);
-                            callback(null, data);
-                        } else {
-                            callback(err);
-                        }
-                    });
-                } else {
-                    callback(err);
-                }
-            })
-        } else {
-            callback(err);
-        }
-    });
-}
-
-function getPopular(callback){
-    var popularData = {episodes: []};
-    Favouritenumber.find().sort({'favourites': -1}).limit(5).exec(function(err, shows) {
-        async.each(shows, function(item, cb){
-            getEpisodeInfo(item.discussionID, function(err, data){
-                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                popularData.episodes.push(ep);
-                cb();
-            });
-        }, function(){
-            if(!err){
-                callback(null, popularData);
-            } else {
-                callback(err);
-            }
-        });
-    });
-}
-
-function mostPopular(callback){
-    var epData = {};
-    Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, shows) {
-        async.each(shows, function(item, cb){
-            getEpisodeInfo(item.discussionID, function(err, data){
-                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                epData = ep;
-                cb();
-            });
-        }, function(){
-            if(!err){
-                callback(null, epData);
-            } else {
-                callback(err);
-            }
-        });
-    });
-}
-
-function isFavourite(username, episode, callback){
-    Favourite.findOne({username: username, discussionID: episode}).exec(function(err, favourites) {
-        if(!err) {
-            if(favourites){
-                 callback(null, '1');
-            } else {
-                callback(null, '0');
-            }
-        } else { callback(err); }
-    });
 }
 
 module.exports = function(passport){
@@ -324,9 +59,9 @@ module.exports = function(passport){
 	}));
 
     router.get('/', isAuthenticated, function(req, res){
-        mostPopular(function (err, popInfo){
+        popular.mostPopular(function (err, popInfo){
             if(!err){
-                getOneFavourite(req.user.username, function(err, favInfo){
+                favourites.getOneFavourite(req.user.username, function(err, favInfo){
                     if(!err) {
                        res.render('index', {username: req.user.username, epFav: favInfo, epPop: popInfo});
                     } else {
@@ -352,10 +87,10 @@ module.exports = function(passport){
 
         var epID = req.params.show + "s" + req.params.season + "e" + req.params.ep;
 
-        isFavourite(req.user.username, epID, function(err, fav) {
+        favourites.isFavourite(req.user.username, epID, function(err, fav) {
             if(!err) {
 
-                getEpisodeInfo(epID, function(err, data){
+                shows.getEpisodeInfo(epID, function(err, data){
                     if(!err){
                         if (req.body.ajax) {
                             res.render('chat', {user: req.user, id: epID, ep: data, favourite: fav});
@@ -374,7 +109,7 @@ module.exports = function(passport){
     });
 
     router.get('/episode/:id', function(req, res){
-        getEpisodeInfo(req.params.id, function(err, data){
+        shows.getEpisodeInfo(req.params.id, function(err, data){
             if(!err){
                 res.render('episode', {data: data});
             } else {
@@ -387,7 +122,7 @@ module.exports = function(passport){
         var series = req.params.show;
         var season = req.params.season;
 
-        getSeasonInfo(series, season, function(err, data){
+        shows.getSeasonInfo(series, season, function(err, data){
             if(!err){
                 res.render('season', {data: data});
             } else {
@@ -400,7 +135,7 @@ module.exports = function(passport){
     });
 
     router.get('/show/search/:name', handleOnlyXhr, function(req, res){
-        getShowInfo(req.params.name, function(err, info){
+        shows.getShowInfo(req.params.name, function(err, info){
             if(!err){
                 res.send(info);
             } else {
@@ -411,9 +146,9 @@ module.exports = function(passport){
 
     router.get('/show/:name', handleOnlyXhr, function(req, res){
         var seriesData = {seasons:[]};
-        getShowInfo(req.params.name, function(err, info){
+        shows.getShowInfo(req.params.name, function(err, info){
             if(!err){
-                getSeasons(info, function(data){
+                shows.getSeasons(info, function(data){
                     res.send(data);
                 });
             } else {
@@ -443,7 +178,7 @@ module.exports = function(passport){
     });
 
     router.post('/favourites', function(req, res){
-        getFavourites(req.body.username, 1, function(err, info){
+        favourites.getFavourites(req.body.username, 1, function(err, info){
            if(!err){
                if(req.xhr) {
                    res.render('favourites', {data: info});
@@ -457,7 +192,7 @@ module.exports = function(passport){
     });
 
     router.post('/favourites/:page', function(req, res){
-        getFavourites(req.body.username, req.params.page, function(err, info){
+        favourites.getFavourites(req.body.username, req.params.page, function(err, info){
            if(!err){
                if(req.xhr) {
                    res.render('favourites', {data: info});
@@ -479,14 +214,14 @@ module.exports = function(passport){
     });
 
     router.get('/isfavourite/:u/:e', function(req,res){
-        isFavourite(req.params.u, req.params.e, function(err, data){
+        favourites.isFavourite(req.params.u, req.params.e, function(err, data){
             res.send(data);
         });
     });
 
     router.post('/popular', isAuthenticated, function(req, res) {
         if(req.xhr && req.body.ajax) {
-            getPopular(function (err, info){
+            popular.getPopular(function (err, info){
                if(!err) {
                    res.render('popular', {data: info});
                } else {
