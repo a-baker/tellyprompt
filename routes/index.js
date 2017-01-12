@@ -1,18 +1,19 @@
 var express = require('express');
 var router = express.Router();
-
+var async = require('async');
 var mongoose = require('mongoose');
+var ObjectId = mongoose.Types.ObjectId;
+
+//models
 var Message = require('../models/message');
 var User = require('../models/user');
 var Favourite = require('../models/favourite');
 var Favouritenumber = require('../models/favouritenumber');
-var async = require('async');
 
+//controllers
 var favourites = require('../controllers/favourites');
 var shows = require('../controllers/shows');
 var popular = require('../controllers/popular');
-
-var ObjectId = require('mongoose').Types.ObjectId;
 
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler
