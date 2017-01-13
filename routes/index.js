@@ -57,20 +57,55 @@ module.exports = function(passport){
 		failureFlash : true
 	}));
 
-    router.get('/', isAuthenticated, function(req, res){
-        popular.mostPopular(function (err, popInfo){
-            if(!err){
-                favourites.getOneFavourite(req.user.username, function(err, favInfo){
-                    if(!err) {
-                       res.render('index', {username: req.user.username, epFav: favInfo, epPop: popInfo});
-                    } else {
-                       res.send(err);
-                    }
+    // router.get('/', isAuthenticated, function(req, res){
+    //     popular.mostPopular(function (err, popInfo){
+    //         if(!err){
+    //             favourites.getOneFavourite(req.user.username, function(err, favInfo){
+    //                 if(!err) {
+    //                    res.render('index', {username: req.user.username, epFav: favInfo, epPop: popInfo});
+    //                 } else {
+    //                    res.send(err);
+    //                 }
+    //             });
+    //         } else {
+    //             res.send(err);
+    //         }
+    //     });
+    // });
+
+    router.get('/', isAuthenticated, function(req,res){
+        function getMostPopular() { 
+            return new Promise(function(resolve, reject){
+                popular.mostPopular(function(err, popInfo){
+                    if (err) throw new Error(err);
+                    resolve(popInfo);
                 });
-            } else {
+            });
+        }
+
+        function getOneFavourite() {
+            return new Promise(function(resolve, reject){
+                favourites.getOneFavourite(req.user.username, function(err, favInfo){
+                    if (err) throw new Error(err);
+                    resolve(favInfo);
+                });
+            });
+        }
+
+        var obj = {username: req.user.username};
+
+        getMostPopular()
+            .then(function( popInfo ){
+                obj.epPop = popInfo;
+                return getOneFavourite();
+            })
+            .then(function( favInfo ){
+                obj.epFav = favInfo;
+                res.render('index', obj);
+            })
+            .catch(function(err){
                 res.send(err);
-            }
-        });
+            });
     });
 
 	/* GET Home Page */
