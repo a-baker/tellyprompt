@@ -4,7 +4,17 @@ var shows = require('./shows')
 
 module.exports = {
     getPopular: getPopular,
-    mostPopular: mostPopular
+    mostPopular: mostPopular,
+    getOneFavourite: getOneFavourite
+}
+
+function getOneFavourite(user) {
+    return new Promise(function(resolve, reject){
+        getOneFavourite(user.username, function(err, favInfo){
+            if (err) throw new Error(err);
+            resolve(favInfo);
+        });
+    });
 }
 
 function getPopular(callback){
@@ -27,20 +37,22 @@ function getPopular(callback){
 }
 
 function mostPopular(callback){
-    var epData = {};
-    Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, showsData) {
-        async.each(showsData, function(item, cb){
-            shows.getEpisodeInfo(item.discussionID, function(err, data){
-                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                epData = ep;
-                cb();
+    return new Promise(function(resolve, reject){
+        var epData = {};
+        Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, showsData) {
+            async.each(showsData, function(item, cb){
+                shows.getEpisodeInfo(item.discussionID, function(err, data){
+                    var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                    epData = ep;
+                    cb();
+                });
+            }, function(){
+                if(!err){
+                    resolve(epData);
+                } else {
+                    reject(err);
+                }
             });
-        }, function(){
-            if(!err){
-                callback(null, epData);
-            } else {
-                callback(err);
-            }
         });
     });
 }

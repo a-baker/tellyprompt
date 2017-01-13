@@ -74,30 +74,11 @@ module.exports = function(passport){
     // });
 
     router.get('/', isAuthenticated, function(req,res){
-        function getMostPopular() { 
-            return new Promise(function(resolve, reject){
-                popular.mostPopular(function(err, popInfo){
-                    if (err) throw new Error(err);
-                    resolve(popInfo);
-                });
-            });
-        }
-
-        function getOneFavourite() {
-            return new Promise(function(resolve, reject){
-                favourites.getOneFavourite(req.user.username, function(err, favInfo){
-                    if (err) throw new Error(err);
-                    resolve(favInfo);
-                });
-            });
-        }
-
         var obj = {username: req.user.username};
-
-        getMostPopular()
+        popular.mostPopular()
             .then(function( popInfo ){
                 obj.epPop = popInfo;
-                return getOneFavourite();
+                return popular.getOneFavourite();
             })
             .then(function( favInfo ){
                 obj.epFav = favInfo;
@@ -281,7 +262,6 @@ module.exports = function(passport){
     router.get('/api/users/id/:id', function(req, res){
         //var userID = new ObjectId(req.params.id);
         var userID = req.params.id;
-        console.log(userID);
         User.findOne( { "_id" : userID }, {password: 0, _id: 0, __v: 0} ).lean().exec(function (err, users) {
             return res.end(JSON.stringify(users));
         });
@@ -318,10 +298,8 @@ module.exports = function(passport){
         // save the message
         message.save(function(err) {
             if (err){
-                console.log('Error in Saving message: '+err);
                 throw err;
             }
-            console.log('message saving succesful');
             Message.find( { discussionID : req.params.id } ).sort('dateTime').lean().exec(function (err, messages) {
             return res.end(JSON.stringify(messages));
         });
@@ -335,7 +313,6 @@ module.exports = function(passport){
         Favourite.findOne({ 'username' :  username, 'discussionID': discussionID }, function(err, favourite) {
             // In case of any error, return using the done method
             if (err){
-                console.log('Error adding to favourites: '+err);
                 return err;
             }
             // already exists
@@ -344,9 +321,7 @@ module.exports = function(passport){
                     if (err) return err;
                     res.send({favourite: 0});
 
-                    Favouritenumber.update({discussionID: discussionID}, {$inc: { favourites: -1 }}, {upsert: true, setDefaultsOnInsert: true}, function(err, data){
-                        console.log('fav -1');
-                    });
+                    Favouritenumber.update({discussionID: discussionID}, {$inc: { favourites: -1 }}, {upsert: true, setDefaultsOnInsert: true});
                 });
             } else {
                 var newFavourite = new Favourite();
@@ -356,14 +331,11 @@ module.exports = function(passport){
                 // save the user
                 newFavourite.save(function(err) {
                     if (err){
-                        console.log('Error in Saving favourite: '+err);
                         throw err;
                     }
                     res.send({favourite: 1});
 
-                    Favouritenumber.update({discussionID: discussionID}, {$inc: { favourites: 1 }}, {upsert: true, setDefaultsOnInsert: true}, function(err, data){
-                        console.log('fav +1');
-                    });
+                    Favouritenumber.update({discussionID: discussionID}, {$inc: { favourites: 1 }}, {upsert: true, setDefaultsOnInsert: true});
 
                     return (newFavourite);
                 });

@@ -92,9 +92,7 @@ io.on('connection', function(socket){
 
 
   socket.on('message', function(msg){
-      console.log('message received');
       io.sockets.in(msg.room).emit('message', msg);
-      console.log(msg);
   });
 });
 
