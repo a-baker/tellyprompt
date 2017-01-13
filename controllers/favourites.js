@@ -39,6 +39,8 @@ function getFavourites(username, page, callback){
           if (err) {
             console.error(err);
           } else {
+            console.log(paginatedResults);
+
             async.each(paginatedResults.docs, function(item, cb){
                 shows.getEpisodeInfo(item.discussionID, function(err, data){
                     var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
@@ -70,6 +72,7 @@ function getOneFavourite(username, callback){
                     Favouritenumber.findOne({discussionID: favourites[i].discussionID}).exec(function(err, favinfo) {
                         if(!err){
                             data.favourites = favinfo.favourites - 1;
+                            console.log(data.favourites);
                             callback(null, data);
                         } else {
                             callback(err);

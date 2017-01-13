@@ -4,17 +4,7 @@ var shows = require('./shows')
 
 module.exports = {
     getPopular: getPopular,
-    mostPopular: mostPopular,
-    getOneFavourite: getOneFavourite
-}
-
-function getOneFavourite(user) {
-    return new Promise(function(resolve, reject){
-        getOneFavourite(user.username, function(err, favInfo){
-            if (err) throw new Error(err);
-            resolve(favInfo);
-        });
-    });
+    mostPopular: mostPopular
 }
 
 function getPopular(callback){
@@ -37,22 +27,20 @@ function getPopular(callback){
 }
 
 function mostPopular(callback){
-    return new Promise(function(resolve, reject){
-        var epData = {};
-        Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, showsData) {
-            async.each(showsData, function(item, cb){
-                shows.getEpisodeInfo(item.discussionID, function(err, data){
-                    var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                    epData = ep;
-                    cb();
-                });
-            }, function(){
-                if(!err){
-                    resolve(epData);
-                } else {
-                    reject(err);
-                }
+    var epData = {};
+    Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, showsData) {
+        async.each(showsData, function(item, cb){
+            shows.getEpisodeInfo(item.discussionID, function(err, data){
+                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                epData = ep;
+                cb();
             });
+        }, function(){
+            if(!err){
+                callback(null, epData);
+            } else {
+                callback(err);
+            }
         });
     });
 }
