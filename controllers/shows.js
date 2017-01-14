@@ -1,4 +1,4 @@
-var unirest = require('unirest');
+var got = require('got');
 var API_KEY = require('../models/tmdbAPIKey');
 
 module.exports = {
@@ -9,80 +9,57 @@ module.exports = {
 }
 
 function getShowInfo(search, callback){
-
+    var searchData, showData; 
     var obj = {"title": "", id: 0, poster:"", "seasons": []};
 
-    unirest.get("https://api.themoviedb.org/3/search/tv?query=" + search + "&api_key=" + API_KEY)
-                    .send()
-                    .end(response=> {
-                        if (response.ok) {
-                            var data = response.body;
-                            if(data.total_results > 0){
-                                var id = data.results[0].id;
-                                obj.id = id;
-                                unirest.get("https://api.themoviedb.org/3/tv/" + id + "?api_key=" + API_KEY)
-                                    .send()
-                                    .end(response=> {
-                                        if (response.ok) {
-                                            var data = response.body;
-                                            obj.title = data.name;
-                                            obj.poster = data.poster_path;
-                                            var seasons = data.seasons;
-                                            seasons.forEach(function(item,index){
-                                                obj.seasons.push({"season": item.season_number, "episodes": item.episode_count, "poster": item.poster_path});
-                                            });
-
-                                            callback(null, obj);
-
-                                        } else {
-                                            console.log("Error getting show: ", response.error);
-                                            callback("Sorry, there was a problem loading that show.");
-                                        }
-                                    });
-                            } else {
-                                callback("No shows found with the name " + search + ".");
-                                return;
-                            }
-                        } else {
-                            console.log("Error in search: ", response.error);
-                            callback("Sorry, there was a problem loading that show.")
-                        }
-                    });
+    got("https://api.themoviedb.org/3/search/tv?query=" + search + "&api_key=" + API_KEY, {json: true})
+        .then(response=> {
+            searchData = response.body;
+            if(searchData.total_results > 0){
+                var id = searchData.results[0].id;
+                obj.id = id;
+                return got("https://api.themoviedb.org/3/tv/" + id + "?api_key=" + API_KEY, {json: true});
+            } else {
+                throw new Error("No results found");
+            }
+        })
+        .then(response=> {
+            showData = response.body;
+            obj.title = showData.name;
+            obj.poster = showData.poster_path;
+            var seasons = showData.seasons;
+            seasons.forEach(function(item,index){
+                obj.seasons.push({"season": item.season_number, "episodes": item.episode_count, "poster": item.poster_path});
+            });
+            callback(null, obj);
+        })
+        .catch(err => {
+            console.log("Error getting show: ", err);
+            callback("Sorry, there was a problem loading that show.")
+        });
 }
 
 function getSeasonInfo(series, season, callback){
+    var showseason, show;
     //GET SEASON
-         unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "?api_key=" + API_KEY)
-            .send()
-            .end(response=> {
-                if (response.ok) {
-                    var showseason = response.body;
-
-                        //GET SHOW
-                        unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + API_KEY)
-                            .send()
-                            .end(response=> {
-                                if (response.ok) {
-                                    var show = response.body;
-
-                                    var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path, "showID" : show.id};
-
-                                    showseason.episodes.forEach(function(item, index){
-                                        seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + item.still_path });
-                                    });
-
-                                    callback(null, seasonData);
-
-                                } else {
-                                    console.log("Got an error: ", response.error);
-                                    callback("Sorry, there was a problem loading that season.");
-                                }
-                            });
-                } else {
-                    console.log("Got an error: ", response.error);
-                    callback("Sorry, there was a problem loading that season.");
-                }
+    got("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "?api_key=" + API_KEY, {json: true})
+        .then(response=> {
+            showseason = response.body;
+            //GET SHOW
+            return got("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + API_KEY, {json: true});
+        })
+        .then(response => {
+            show = response.body;
+            var seasonData = {"season": season, "show": show.name, "episodes": [], "backdrop": "http://image.tmdb.org/t/p/original" + show.backdrop_path, "showID" : show.id};
+            showseason.episodes.forEach(function(item, index){
+                seasonData.episodes.push({"episode": item.episode_number, "title": item.name, "still": item.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + item.still_path });
             });
+            callback(null, seasonData);
+        })
+        .catch(err => {
+            console.log("Got an error: ", err);
+            callback("Sorry, there was a problem loading that season.");
+        });
 }
 
 function getSeasons(series, callback){
@@ -113,33 +90,22 @@ function getEpisodeInfo(id, callback){
     var season = epstring.substring(s+1, e);
     var episode = epstring.substring(e+1, epstring.length);
 
+    var ep, show;
+
      //GET EPISODE
-     unirest.get("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "/episode/" + episode + "?api_key=" + API_KEY)
-        .send()
-        .end(response=> {
-            if (response.ok) {
-                var ep = response.body;
-
-                    //GET SHOW
-                    unirest.get("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + API_KEY)
-                        .send()
-                        .end(response=> {
-                            if (response.ok) {
-                                var show = response.body;
-
-                                var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": ep.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + ep.still_path , "showID": show.id};
-
-                                callback(null, showData);
-
-
-                            } else {
-                                console.log("Got an error: ", response.error);
-                                callback("Sorry, there was a problem loading that episode.");
-                            }
-                        });
-            } else {
-                console.log("Got an error: ", response.error);
-                callback("Sorry, there was a problem loading that episode.");
-            }
+     got("https://api.themoviedb.org/3/tv/" + series + "/season/" + season + "/episode/" + episode + "?api_key=" + API_KEY, {json: true})
+        .then(response=> {
+            //GET SHOW
+            ep = response.body;
+            return got("https://api.themoviedb.org/3/tv/" + series + "?api_key=" + API_KEY, {json: true});         
+        })
+        .then(response=> {
+            show = response.body;
+            var showData = {'title': ep.name, "season": season, "episode": episode, show: show.name, "still": ep.still_path == null? "/img/nostill.jpg" : "http://image.tmdb.org/t/p/original" + ep.still_path , "showID": show.id};
+            callback(null, showData);
+        })
+        .catch(err => {
+            console.log("Got an error: ", err);
+            callback("Sorry, there was a problem loading that episode.");
         });
 }

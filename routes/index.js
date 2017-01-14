@@ -74,30 +74,11 @@ module.exports = function(passport){
     // });
 
     router.get('/', isAuthenticated, function(req,res){
-        function getMostPopular() { 
-            return new Promise(function(resolve, reject){
-                popular.mostPopular(function(err, popInfo){
-                    if (err) throw new Error(err);
-                    resolve(popInfo);
-                });
-            });
-        }
-
-        function getOneFavourite() {
-            return new Promise(function(resolve, reject){
-                favourites.getOneFavourite(req.user.username, function(err, favInfo){
-                    if (err) throw new Error(err);
-                    resolve(favInfo);
-                });
-            });
-        }
-
         var obj = {username: req.user.username};
-
-        getMostPopular()
+        popular.mostPopular()
             .then(function( popInfo ){
                 obj.epPop = popInfo;
-                return getOneFavourite();
+                return favourites.getOneFavourite(req.user.username);
             })
             .then(function( favInfo ){
                 obj.epFav = favInfo;

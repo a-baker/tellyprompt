@@ -27,20 +27,22 @@ function getPopular(callback){
 }
 
 function mostPopular(callback){
-    var epData = {};
-    Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, showsData) {
-        async.each(showsData, function(item, cb){
-            shows.getEpisodeInfo(item.discussionID, function(err, data){
-                var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
-                epData = ep;
-                cb();
+    return new Promise((resolve, reject) => {
+        var epData = {};
+        Favouritenumber.find().sort({'favourites': -1}).limit(1).exec(function(err, showsData) {
+            async.each(showsData, function(item, cb){
+                shows.getEpisodeInfo(item.discussionID, function(err, data){
+                    var ep = {"show": data.show, "season": data.season, "episode": data.episode, "title": data.title, "still": data.still, "showID": data.showID};
+                    epData = ep;
+                    cb();
+                });
+            }, function(){
+                if(!err){
+                    resolve(epData);
+                } else {
+                    throw new Error(err);
+                }
             });
-        }, function(){
-            if(!err){
-                callback(null, epData);
-            } else {
-                callback(err);
-            }
         });
     });
 }

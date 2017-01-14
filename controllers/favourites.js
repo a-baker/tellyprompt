@@ -60,31 +60,32 @@ function getFavourites(username, page, callback){
     });
 }
 
-function getOneFavourite(username, callback){
-    Favourite.find({username: username}).exec(function(err, favourites) {
-        var length = favourites.length;
+function getOneFavourite(username){
+    return new Promise((resolve, reject) => {
+        Favourite.find({username: username}).exec(function(err, favourites) {
+            var length = favourites.length;
 
-        var i = Math.floor(Math.random() * favourites.length);
+            var i = Math.floor(Math.random() * favourites.length);
 
-        if(!err && favourites[i]){
-            shows.getEpisodeInfo(favourites[i].discussionID, function(err, data){
-                if(!err){
-                    Favouritenumber.findOne({discussionID: favourites[i].discussionID}).exec(function(err, favinfo) {
-                        if(!err){
-                            data.favourites = favinfo.favourites - 1;
-                            console.log(data.favourites);
-                            callback(null, data);
-                        } else {
-                            callback(err);
-                        }
-                    });
-                } else {
-                    callback(err);
-                }
-            })
-        } else {
-            callback(err);
-        }
+            if(!err && favourites[i]){
+                shows.getEpisodeInfo(favourites[i].discussionID, function(err, data){
+                    if(!err){
+                        Favouritenumber.findOne({discussionID: favourites[i].discussionID}).exec(function(err, favinfo) {
+                            if(!err){
+                                data.favourites = favinfo.favourites - 1;
+                                resolve(data);
+                            } else {
+                                throw new Error(err);
+                            }
+                        });
+                    } else {
+                        throw new Error(err);
+                    }
+                })
+            } else {
+                throw new Error(err);
+            }
+        });
     });
 }
 
