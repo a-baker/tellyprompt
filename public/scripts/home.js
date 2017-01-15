@@ -2,6 +2,7 @@ var bar = new Nanobar({
 });
 
 var defaultSearch = "";
+var sections = {};
 
 function toBody() {
     $('.welcome').hide();
@@ -46,6 +47,7 @@ var searchPage = function(){
 
             $('.body').html("");
             $('.body').append(res);
+            sections.search = res;
             bar.go(100);
             document.title = "Search - Tellyprompt";
         }
@@ -53,10 +55,19 @@ var searchPage = function(){
 }
 
 var favouritesPage = function(pagenum) {
-    bar.go(30);
-
     $('.navbar-right').children().removeClass('active');
     $('.btn_fav').parent().addClass('active');
+    document.title = "Favourites - Tellyprompt";
+
+    if (sections.favourites) {
+        $('.body').html("");
+        $('.body').html(sections.favourites);
+        chatredirect();
+        updateFavPageButtons(1);
+        window.history.pushState(null, "", "/favourites/1");
+        return;
+    }
+    bar.go(30);
 
     $.ajax({
         url: "/favourites/" + pagenum,
@@ -71,10 +82,10 @@ var favouritesPage = function(pagenum) {
                 window.history.pushState(null, "", "/favourites/" + pagenum);
             }
             $('.body').html("");
+            sections.favourites = res;
             $('.body').append(res);
             bar.go(100);
-            document.title = "Favourites - Tellyprompt";
-            chatredirect()
+            chatredirect();
             updateFavPageButtons(page);
 
             if(pagenum !== page) {

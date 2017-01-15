@@ -150,26 +150,26 @@ module.exports = function(passport){
     });
 
     router.get('/show/search/:name', handleOnlyXhr, function(req, res){
-        shows.getShowInfo(req.params.name, function(err, info){
-            if(!err){
+        shows.getShowInfo(req.params.name)
+            .then(info => {
                 res.send(info);
-            } else {
+            })
+            .catch(err => {
                 res.send(err);
-            }
-        });
+            });
     });
 
     router.get('/show/:name', handleOnlyXhr, function(req, res){
         var seriesData = {seasons:[]};
-        shows.getShowInfo(req.params.name, function(err, info){
-            if(!err){
+        shows.getShowInfo(req.params.name)
+            .then(info => {
                 shows.getSeasons(info, function(data){
                     res.send(data);
                 });
-            } else {
+            })
+            .catch(err => {
                 res.send(err);
-            }
-        });
+            });
     });
 
     router.get('/search', isAuthenticated, function(req, res){

@@ -8,35 +8,36 @@ module.exports = {
     getEpisodeInfo: getEpisodeInfo
 }
 
-function getShowInfo(search, callback){
+function getShowInfo(search){
     var searchData, showData; 
     var obj = {"title": "", id: 0, poster:"", "seasons": []};
-
-    got("https://api.themoviedb.org/3/search/tv?query=" + search + "&api_key=" + API_KEY, {json: true})
-        .then(response=> {
-            searchData = response.body;
-            if(searchData.total_results > 0){
-                var id = searchData.results[0].id;
-                obj.id = id;
-                return got("https://api.themoviedb.org/3/tv/" + id + "?api_key=" + API_KEY, {json: true});
-            } else {
-                throw new Error("No results found");
-            }
-        })
-        .then(response=> {
-            showData = response.body;
-            obj.title = showData.name;
-            obj.poster = showData.poster_path;
-            var seasons = showData.seasons;
-            seasons.forEach(function(item,index){
-                obj.seasons.push({"season": item.season_number, "episodes": item.episode_count, "poster": item.poster_path});
+    return new Promise((resolve, reject) => {
+        got("https://api.themoviedb.org/3/search/tv?query=" + search + "&api_key=" + API_KEY, {json: true})
+            .then(response=> {
+                searchData = response.body;
+                if(searchData.total_results > 0){
+                    var id = searchData.results[0].id;
+                    obj.id = id;
+                    return got("https://api.themoviedb.org/3/tv/" + id + "?api_key=" + API_KEY, {json: true});
+                } else {
+                    throw new Error("No results found");
+                }
+            })
+            .then(response=> {
+                showData = response.body;
+                obj.title = showData.name;
+                obj.poster = showData.poster_path;
+                var seasons = showData.seasons;
+                seasons.forEach(function(item,index){
+                    obj.seasons.push({"season": item.season_number, "episodes": item.episode_count, "poster": item.poster_path});
+                });
+                resolve(obj);
+            })
+            .catch(err => {
+                console.log("Error getting show: ", err);
+                reject("Sorry, there was a problem loading that show.")
             });
-            callback(null, obj);
-        })
-        .catch(err => {
-            console.log("Error getting show: ", err);
-            callback("Sorry, there was a problem loading that show.")
-        });
+    });
 }
 
 function getSeasonInfo(series, season, callback){
