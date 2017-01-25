@@ -98,30 +98,27 @@ module.exports = function(passport){
 		res.render('info', {title: "Info - Tellyprompt"});
 	});
 
-    router.post('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
+    router.get('/chat/:show/:season/:ep', function(req, res){
 
         var epID = req.params.show + "s" + req.params.season + "e" + req.params.ep;
 
-        favourites.isFavourite(req.user.username, epID, function(err, fav) {
-            if(!err) {
+        favourites.isFavourite(req.user? req.user.username : null, epID, function(err, fav) {
+            if( !err ) {
+                var favData = fav; 
+            } else {
+                var favData = 0;
+            }
 
-                shows.getEpisodeInfo(epID, function(err, data){
-                    if(!err){
-                        if (req.body.ajax) {
-                            res.render('chat', {user: req.user, id: epID, ep: data, favourite: fav});
-                        }
-                    } else {
-                        res.send(err);
-                    }
-                });
-
-            } else { res.send(err); }
+            shows.getEpisodeInfo(epID, function(err, data){
+                if(!err){
+                    res.send({user: req.user ? req.user.username : null, id: epID, ep: data, favourite: favData});
+                } else {
+                    res.send(err);
+                }
+            });
         });
 	});
 
-    router.get('/chat/:show/:season/:ep', isAuthenticated, function(req, res){
-        res.render('index', {username: req.user.username});
-    });
 
     router.get('/episode/:id', function(req, res){
         shows.getEpisodeInfo(req.params.id, function(err, data){
